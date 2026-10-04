@@ -9,6 +9,7 @@ on:
         default: false
   push:
     branches:
+      - main
       - reverse-0915
     paths-ignore:
       - "docs/**"
@@ -26,6 +27,14 @@ jobs:
       contents: write
 
     steps:
+      - name: Require main for releases
+        if: inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community ')
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF -ne 'refs/heads/main') {
+            throw 'Releases must be built and published from main.'
+          }
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -84,17 +93,35 @@ jobs:
           compression-level: 0
 
       - name: Publish release
-        if: inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community ')
+        if: github.ref == 'refs/heads/main' && (inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community '))
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $tag = "v$version"
+          $repo = $env:GITHUB_REPOSITORY
+          Get-ChildItem dist/*.exe | ForEach-Object {
+            $name = $_.Name.Replace(' ', '.')
+            if ($name -ne $_.Name) { Rename-Item $_.FullName $name }
+          }
           $packages = @(Get-ChildItem dist/*.exe)
           $packages | ForEach-Object {
             $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
             "$hash  $($_.Name)"
           } | Set-Content dist/SHA256SUMS.txt -Encoding ascii
+          Get-Content dist/SHA256SUMS.txt
           $assets = @($packages.FullName) + @("dist/SHA256SUMS.txt")
-          gh release create "v$version" @assets --target "$env:GITHUB_SHA" --title "TTime Community $version" --notes-file "docs/releases/v$version.md" --latest
+          $releases = gh api "repos/$repo/releases?per_page=100" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $existing = $releases | Where-Object { $_.tag_name -eq $tag } | Select-Object -First 1
+          if ($existing) {
+            gh release upload "$tag" @assets --clobber
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            @{ sha = $env:GITHUB_SHA; force = $true } | ConvertTo-Json | gh api --method PATCH "repos/$repo/git/refs/tags/$tag" --input -
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            gh release edit "$tag" --target main --title "TTime Community $version" --notes-file "docs/releases/$tag.md" --latest
+          } else {
+            gh release create "$tag" @assets --target "$env:GITHUB_SHA" --title "TTime Community $version" --notes-file "docs/releases/$tag.md" --latest
+          }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
