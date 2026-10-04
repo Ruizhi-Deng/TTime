@@ -5,6 +5,7 @@
       <Input
         ref='translateInput'
         @show-result-event='(value) => translatedResultInput.setShowResult(value)'
+        @request-id-event='(value) => translatedResultInput.setRequestId(value)'
         @is-result-loading-event='(value) => translatedResultInput.setIsResultLoading(value)'
         v-show='!hideTranslateInput'
       />

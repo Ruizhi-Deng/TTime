@@ -174,10 +174,10 @@ Object.keys(TranslateServiceEnum)
   .filter((key) => typeof TranslateServiceEnum[key] === 'string')
   .map((key) => TranslateServiceEnum[key].toLowerCase())
   .forEach((code) => {
-    apiTranslateCallbackEventList[code + 'ApiTranslateCallbackEvent'] = (callback): void => {
-      ipcRenderer.on(code + '-api-translate-callback-event', (_event, obj) => {
-        callback(obj)
-      })
+    apiTranslateCallbackEventList[code + 'ApiTranslateCallbackEvent'] = (callback): (() => void) => {
+      const listener = (_event, obj): void => callback(obj)
+      ipcRenderer.on(code + '-api-translate-callback-event', listener)
+      return () => ipcRenderer.removeListener(code + '-api-translate-callback-event', listener)
     }
   })
 
@@ -189,8 +189,8 @@ Object.keys(TranslateServiceEnum)
  * @param type 翻译渠道类型
  * @param msg  回调消息内容
  */
-const apiTranslateResultMsgCallbackEvent = (type, msg): void => {
-  ipcRenderer.invoke('api-translate-result-msg-callback-event', type, msg)
+const apiTranslateResultMsgCallbackEvent = (type, msg, info): void => {
+  ipcRenderer.invoke('api-translate-result-msg-callback-event', type, msg, info)
 }
 
 /**

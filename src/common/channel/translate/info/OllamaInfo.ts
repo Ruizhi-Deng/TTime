@@ -1,13 +1,13 @@
 import languageList from '../aiLanguageList'
 
 export default {
-  name: 'OpenAI',
+  name: 'Ollama',
   isKey: true,
   isOneAppKey: true,
   keyRequired: false,
   defaultInfo: {
     model: '',
-    requestUrl: 'https://api.openai.com/v1/chat/completions',
+    requestUrl: 'http://127.0.0.1:11434/api/chat',
     aiPromptId: 'translate',
     stream: true
   },

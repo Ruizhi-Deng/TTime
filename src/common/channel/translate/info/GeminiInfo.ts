@@ -1,13 +1,13 @@
 import languageList from '../aiLanguageList'
 
 export default {
-  name: 'OpenAI',
+  name: 'Gemini',
   isKey: true,
   isOneAppKey: true,
-  keyRequired: false,
+  keyRequired: true,
   defaultInfo: {
     model: '',
-    requestUrl: 'https://api.openai.com/v1/chat/completions',
+    requestUrl: 'https://generativelanguage.googleapis.com/v1beta',
     aiPromptId: 'translate',
     stream: true
   },

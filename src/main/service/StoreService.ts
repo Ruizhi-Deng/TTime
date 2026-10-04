@@ -10,6 +10,7 @@ import { GlobalShortcutEvent } from './GlobalShortcutEvent'
 import { WinEvent } from './Win'
 import log from '../utils/log'
 import * as fse from 'fs-extra'
+import { defaultAiPrompts } from '../../common/utils/aiPrompts'
 
 /**
  * app.getPath('userData')
@@ -107,6 +108,9 @@ class StoreService {
   }
 
   static initConfig = (): void => {
+    if (!StoreService.configHas('aiPrompts')) {
+      StoreService.configSet('aiPrompts', defaultAiPrompts)
+    }
     // 首次打开时设置默认快捷键
     if (!StoreService.configHas('inputShortcutKey')) {
       StoreService.configSet('inputShortcutKey', 'Alt + Q')

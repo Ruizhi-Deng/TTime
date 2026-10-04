@@ -92,7 +92,12 @@ const clearTranslatedResultContentEvent = (): void => {
   })
 }
 
+const setRequestId = (requestId: string): void => {
+  channelRefs.value.forEach(channel => channel.setRequestId(requestId))
+}
+
 defineExpose({
+  setRequestId,
   setTranslatedResultContent,
   clearTranslatedResultContentEvent,
   setShowResult,

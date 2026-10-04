@@ -1,13 +1,13 @@
 import languageList from '../aiLanguageList'
 
 export default {
-  name: 'OpenAI',
+  name: '智谱 GLM',
   isKey: true,
   isOneAppKey: true,
-  keyRequired: false,
+  keyRequired: true,
   defaultInfo: {
     model: '',
-    requestUrl: 'https://api.openai.com/v1/chat/completions',
+    requestUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
     aiPromptId: 'translate',
     stream: true
   },

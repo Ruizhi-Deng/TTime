@@ -9,6 +9,8 @@ class TranslateServiceRecordVo {
    */
   translateServiceType: string
 
+  translateServiceName: string
+
   /**
    * 翻译服务Id
    */

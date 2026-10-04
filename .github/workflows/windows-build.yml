@@ -37,6 +37,9 @@ jobs:
       - name: Verify local history
         run: npm run test:local
 
+      - name: Verify AI requests and streams
+        run: npm run test:ai
+
       - name: Build Electron app
         run: npm run build
 

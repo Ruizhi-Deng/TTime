@@ -33,6 +33,12 @@ class TranslateServiceEnum {
    */
   static OPEN_AI = 'OpenAI'
 
+  static DEEP_SEEK = 'DeepSeek'
+  static OLLAMA = 'Ollama'
+  static GEMINI = 'Gemini'
+  static ZHIPU = 'Zhipu'
+  static DEEP_LX = 'DeepLX'
+
   /**
    * AzureOpenAI翻译
    */

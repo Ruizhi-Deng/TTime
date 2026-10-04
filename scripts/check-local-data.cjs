@@ -17,7 +17,7 @@ function loadSource(entryPoint, globals = {}) {
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 
-const stores = { config: { translateHistoryStatus: 1 }, historyRecord: {} }
+const stores = { config: { translateHistoryStatus: 'Y' }, historyRecord: {} }
 const api = {
   cacheGet: (type, key) => clone(stores[type][key] ?? null),
   cacheSet: (type, key, value) => {
@@ -53,7 +53,7 @@ assert.equal(
   history.getTranslateRecordList()[43].translateServiceRecordList[0].translateStatus,
   false
 )
-assert.deepEqual(stores.config, { translateHistoryStatus: 1 })
+assert.deepEqual(stores.config, { translateHistoryStatus: 'Y' })
 history.updateTranslateRecordList(
   history.getTranslateRecordList().filter((record) => record.requestId !== '44')
 )

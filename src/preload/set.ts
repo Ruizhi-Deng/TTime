@@ -46,10 +46,10 @@ const apiUniteTranslateCheck = (type, info): void => {
 /**
  * 统一翻译校验回调
  */
-const apiCheckTranslateCallbackEvent = (callback): void => {
-  ipcRenderer.on('api-check-translate-callback-event', (_event, type, res) => {
-    callback(type, res)
-  })
+const apiCheckTranslateCallbackEvent = (callback): (() => void) => {
+  const listener = (_event, type, res): void => callback(type, res)
+  ipcRenderer.on('api-check-translate-callback-event', listener)
+  return () => ipcRenderer.removeListener('api-check-translate-callback-event', listener)
 }
 
 /**
