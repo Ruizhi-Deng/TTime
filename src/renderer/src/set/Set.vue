@@ -6,9 +6,6 @@
       <el-aside width="200px">
         <el-scrollbar>
           <el-menu :default-active="menuIndex" @select="menuSelect">
-            <el-menu-item index="myInfo">
-              <span class="none-select">我的</span>
-            </el-menu-item>
             <el-menu-item index="basiInfo">
               <span class="none-select">偏好设置</span>
             </el-menu-item>
@@ -40,7 +37,6 @@
       <el-container>
         <el-main class="main">
           <el-scrollbar>
-            <my-info v-if="menuIndex === 'myInfo'" />
             <basi-info v-if="menuIndex === 'basiInfo'" />
             <advanced-info v-else-if="menuIndex === 'advancedInfo'" />
             <shortcut-key v-else-if="menuIndex === 'shortcutKey'" />
@@ -58,7 +54,6 @@
 
 <script lang="ts" setup>
 import Header from './components/Header.vue'
-import MyInfo from './components/fun/MyInfo.vue'
 import BasiInfo from './components/fun/BasiInfo.vue'
 import AdvancedInfo from './components/fun/AdvancedInfo.vue'
 import ShortcutKey from './components/fun/ShortcutKey.vue'
@@ -81,7 +76,7 @@ const getPageMenuIndex = (): string => {
   // 读取后缓存数据
   cacheDelete('setPageMenuIndex')
   // 如果菜单索引为空则默认展示偏好设置
-  return isNull(setPageMenuIndex) ? 'myInfo' : setPageMenuIndex
+  return isNull(setPageMenuIndex) ? 'basiInfo' : setPageMenuIndex
 }
 
 /**

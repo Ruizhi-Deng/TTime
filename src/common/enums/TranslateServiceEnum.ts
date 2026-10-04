@@ -2,15 +2,6 @@
  * 翻译服务枚举
  */
 class TranslateServiceEnum {
-  /**
-   * TTime翻译
-   */
-  static TTIME = 'TTime'
-
-  /**
-   * TTimeAI翻译
-   */
-  static TTIME_AI = 'TTimeAI'
 
   /**
    * 腾讯翻译君
@@ -81,11 +72,6 @@ class TranslateServiceEnum {
    * 小牛翻译
    */
   static NIU_TRANS = 'NiuTrans'
-
-  /**
-   * 小牛翻译(内置)
-   */
-  static NIU_TRANS_BUILT_IN = 'NiuTransBuiltIn'
 
   /**
    * 彩云翻译

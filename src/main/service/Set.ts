@@ -11,7 +11,6 @@ import { SystemTypeEnum } from '../enums/SystemTypeEnum'
 import { StoreTypeEnum } from '../../common/enums/StoreTypeEnum'
 import StoreService from './StoreService'
 import { StoreConfigFunTypeEnum } from '../../common/enums/StoreConfigFunTypeEnum'
-import TTimeAuth from './auth/TTimeAuth'
 import BrowserWindowConstructorOptions = Electron.BrowserWindowConstructorOptions
 import { ecDictDbClose } from './channel/interfaces/EcDictRequest'
 
@@ -69,8 +68,6 @@ function createSetWindow(): void {
   // 禁用按下F11全屏事件
   setWin.setFullScreenable(false)
   GlobalWin.setSetWin(setWin)
-
-  TTimeAuth.refresh()
 
   /**
    * 窗口显示时触发事件

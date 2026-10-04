@@ -8,11 +8,6 @@ class OcrServiceEnum {
   static TTIME = 'TTime'
 
   /**
-   * TTime在线OCR
-   */
-  static TTIME_ONLINE = 'TTimeOnline'
-
-  /**
    * 百度智能云OCR
    */
   static BAIDU = 'Baidu'

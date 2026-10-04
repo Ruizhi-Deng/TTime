@@ -204,20 +204,6 @@ const apiUniteTranslate = (type, info): void => {
 }
 
 /**
- * 应用启动
- */
-const ttimeApiAppStart = (): void => {
-  ipcRenderer.invoke('ttime-api-app-start')
-}
-
-/**
- * 应用翻译使用
- */
-const ttimeApiTranslateUse = (): void => {
-  ipcRenderer.invoke('ttime-api-translate-use')
-}
-
-/**
  * 更新翻译源通知
  *
  * @param callback 回调方法 用于主进程内部触发时推送到Vue页面执行
@@ -310,10 +296,8 @@ const api = {
   winShowEvent,
   winShowByInputEvent,
   apiUniteTranslate,
-  ttimeApiAppStart,
   updateTranslateServiceEvent,
   updateTranslateServiceNotify,
-  ttimeApiTranslateUse,
   apiTranslateResultMsgCallbackEvent,
   agentApiTranslate,
   agentApiTranslateCallback,

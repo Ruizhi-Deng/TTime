@@ -380,8 +380,7 @@ const isStreamTranslateService = (): boolean => {
   const type = props.translateService['type']
   return (
     TranslateServiceEnum.OPEN_AI === type ||
-    TranslateServiceEnum.AZURE_OPEN_AI === type ||
-    TranslateServiceEnum.TTIME_AI === type
+    TranslateServiceEnum.AZURE_OPEN_AI === type
   )
 }
 

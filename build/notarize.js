@@ -15,7 +15,7 @@ module.exports = async (context) => {
     return
   }
 
-  const appId = 'com.ttime.app'
+  const appId = 'com.ruizhideng.ttime.community'
 
   const { appOutDir } = context
 

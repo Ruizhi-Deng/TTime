@@ -64,8 +64,6 @@
           </div>
         </el-tooltip>
 
-        <vip-info-service-buttons :service-type='ServiceTypeEnum.OCR' />
-
       </div>
     </div>
     <div class='translate-service-set-block'>
@@ -225,9 +223,6 @@ import { OcrSpaceModelEnum } from '../../../../../../common/enums/OcrSpaceModelE
 import { TencentCloudOcrLanguageEnum } from '../../../../../../common/enums/TencentCloudOcrLanguageEnum'
 import { TencentCloudImageOcrLanguageEnum } from '../../../../../../common/enums/TencentCloudImageOcrLanguageEnum'
 import { BaiduImageOcrLanguageEnum } from '../../../../../../common/enums/BaiduImageOcrLanguageEnum'
-import { loadNewServiceInfo, saveServiceInfoHandle } from '../../../../utils/memberUtil'
-import { ServiceTypeEnum } from '../../../../../../common/enums/ServiceTypeEnum'
-import VipInfoServiceButtons from './vip/VipInfoServiceButtons.vue'
 
 // Ocr服务验证状态
 const checkIngStatus = ref(false)
@@ -302,24 +297,10 @@ const addService = (type): void => {
     }
   }
   const service = buildOcrService(type)
-  for (const ocrService of insideOcrServiceMap.values()) {
-    if (
-      ocrService.type === OcrServiceEnum.TTIME &&
-      ocrService.useStatus &&
-      service.type === OcrServiceEnum.TTIME_ONLINE &&
-      service.useStatus
-    ) {
-      ocrService.useStatus = false
-      saveOcrService(ocrService)
-      break
-    }
-  }
   if (null !== service) {
     saveOcrService(service)
     ocrServiceThis.value = service
   }
-  // 保存服务信息事件
-  saveServiceInfoHandle(ServiceTypeEnum.OCR)
 }
 
 /**
@@ -340,8 +321,6 @@ const deleteService = (): void => {
   updateThisServiceMap(insideOcrServiceMap)
   // 设置当前选中项默认为第一个Ocr服务
   selectOneServiceThis()
-  // 保存服务信息事件
-  saveServiceInfoHandle(ServiceTypeEnum.OCR)
 }
 
 /**
@@ -408,8 +387,6 @@ window.api.apiCheckOcrCallbackEvent((type, res): void => {
   if (ocrServiceThis.value.id === insideOcrService.id) {
     ocrServiceThis.value = insideOcrService
   }
-  // 保存服务信息事件
-  saveServiceInfoHandle(ServiceTypeEnum.OCR)
 })
 
 /**
@@ -446,8 +423,6 @@ const serviceUseStatusChange = (ocrService): void => {
       }
     }
   }
-  // 保存服务信息事件
-  saveServiceInfoHandle(ServiceTypeEnum.OCR)
 }
 
 /**
@@ -480,8 +455,6 @@ const serviceSortDragChange = (event): void => {
   setOcrServiceMap(swappedMap)
   // 更新页面绑定翻译OCR数据
   updateThisServiceMap(swappedMap)
-  // 保存服务信息事件
-  saveServiceInfoHandle(ServiceTypeEnum.OCR)
 }
 
 /**
@@ -505,17 +478,6 @@ const ocrSpaceModelUpdate = (): void => {
   // 英语在所有三个模型中都存在的
   ocrServiceThis.value['languageType'] = 'eng'
 }
-
-/**
- * 刷新服务信息事件
- */
-window.api.refreshServiceInfoEvent(() => {
-  updateThisServiceMap(getOcrServiceMap())
-  // 设置当前选中项默认为第一个服务
-  selectOneServiceThis()
-})
-
-loadNewServiceInfo()
 
 </script>
 

@@ -15,6 +15,6 @@ const zeroExpand = (num): string => {
 }
 const dateName =
   date.getFullYear() + '-' + zeroExpand(date.getMonth() + 1) + '-' + zeroExpand(date.getDate())
-// 输出路径 : /Users/用户账号名称/Library/Application Support/time-translate/logs/年-月-日.log
+// 输出路径 : /Users/用户账号名称/Library/Application Support/TTime Community/logs/年-月-日.log
 log.transports.file.resolvePath = () => path.join(StoreService.logsPath, dateName + '.log')
 export default log

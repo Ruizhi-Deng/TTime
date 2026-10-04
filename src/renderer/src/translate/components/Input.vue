@@ -219,8 +219,6 @@ const translateFun = (): void => {
   }
   // 设置显示翻译加载中状态
   emit('is-result-loading-event', true)
-  // 应用翻译使用
-  window.api.ttimeApiTranslateUse()
   // 获取当前正在使用的翻译源
   const translateServiceMapData = getTranslateServiceMapByUse()
   // 构建翻译记录信息

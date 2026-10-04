@@ -1,10 +1,10 @@
 {
-  "name": "time-translate",
-  "version": "0.9.2",
+  "name": "ttime-community",
+  "version": "0.9.2-community.1",
   "description": "一款简洁、高效、高颜值的输入、截图、划词翻译软件",
   "main": "./out/main/index.js",
   "author": "byliangcheng",
-  "homepage": "https://ttime.timerecord.cn/",
+  "homepage": "https://github.com/Ruizhi-Deng/TTime",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix",
@@ -20,7 +20,8 @@
     "build:mac": "npm run modules-update && npm run build && electron-builder --mac --config",
     "build:linux": "npm run modules-update && npm run build && electron-builder --linux --config",
     "npm-i-extend-modules-update": "npm i && npm run modules-update",
-    "modules-update": "node modules-update.ts"
+    "modules-update": "node modules-update.ts",
+    "test:local": "node scripts/check-local-data.cjs"
   },
   "dependencies": {
     "@alicloud/alimt20181012": "1.0.4",
@@ -54,7 +55,6 @@
     "@vitejs/plugin-vue": "3.2.0",
     "@vue/eslint-config-prettier": "7.0.0",
     "@vue/eslint-config-typescript": "11.0.2",
-    "download": "8.0.0",
     "electron": "20.3.1",
     "electron-builder": "23.6.0",
     "electron-vite": "1.0.14",
@@ -70,5 +70,6 @@
     "vue": "3.2.45",
     "vue-router": "4.1.6",
     "vuedraggable": "4.1.0"
-  }
+  },
+  "productName": "TTime Community"
 }

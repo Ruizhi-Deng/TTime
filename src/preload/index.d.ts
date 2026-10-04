@@ -24,8 +24,6 @@ declare global {
     agentApiOcr
     agentApiOcrCallback
     updateCacheEvent
-    ttimeApiAppStart
-    ttimeApiTranslateUse
     winFontSizeNotify
     winSizeUpdate
   }

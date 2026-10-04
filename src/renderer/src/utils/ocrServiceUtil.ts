@@ -9,19 +9,11 @@ import ServiceConfig from '../../../common/class/ServiceConfig'
  * @param ocrServiceMap Ocr服务list
  */
 export const setOcrServiceMap = (ocrServiceMap): void => {
-  if (ocrServiceMap.size > 0) {
-    const ocrServiceOne = ocrServiceMap.entries().next().value[0]
-    if (isNull(ocrServiceOne['index'])) {
-      let index = 0
-      ocrServiceMap.forEach((ocrService) => {
-        ocrService['index'] = index
-        index++
-      })
-    }
-    ocrServiceMap.forEach((ocrService) => {
-      delete ocrService.serviceInfo
-    })
-  }
+  let index = 0
+  ocrServiceMap.forEach((service) => {
+    service.index = index++
+    delete service.serviceInfo
+  })
   cacheSet('ocrServiceMap', Array.from(ocrServiceMap.entries()))
   // 上面移除完毕保存后重新设置渠道信息
   ocrServiceMap.forEach((translateService) => {
@@ -34,15 +26,6 @@ export const setOcrServiceMap = (ocrServiceMap): void => {
  */
 export const getOcrServiceMap = (): Map<any, any> => {
   let map = new Map(cacheGet('ocrServiceMap'))
-  if (map.size > 0) {
-    // 因为之前的版本中的数据没有 index 所以这里默认获取第一条翻译源
-    // 看是否有设置 index 如果没有默认赋值一遍
-    const ocrServiceOne = map.entries().next().value[0]
-    if (isNull(ocrServiceOne['index'])) {
-      setOcrServiceMap(map)
-    }
-  }
-  map = new Map(cacheGet('ocrServiceMap'))
   // 将 Map 转换为包含键值对数组的二维数组
   const entries = Array.from(map.entries())
   // 对二维数组按照对象的 index 属性进行排序

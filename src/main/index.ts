@@ -5,16 +5,13 @@ import { GlobalShortcutEvent } from './service/GlobalShortcutEvent'
 import { WinEvent } from './service/Win'
 import { TrayEvent } from './service/TrayEvent'
 import log from './utils/log'
-import AutoUpdater from './service/AutoUpdater'
 import { SystemTypeEnum } from './enums/SystemTypeEnum'
 import GlobalWin from './service/GlobalWin'
-import './service/TTimeEvent'
 import './service/channel/TranslateChannel'
 import './service/HoverBall'
 import './service/Ocr'
 import './service/OcrSilence'
 import './service/ClipboardListenerService'
-import { initServer } from './service/WebServer'
 import './service/IpcMainHandle'
 import { injectWinAgent } from './utils/RequestUtil'
 import StoreService from './service/StoreService'
@@ -54,9 +51,6 @@ if (gotTheLock) {
   // 这里直接执行退出当前重复实例即可
   app.quit()
 }
-
-// 初始化服务
-initServer()
 
 function createWindow(): void {
   mainWin = new BrowserWindow({
@@ -110,8 +104,6 @@ function createWindow(): void {
   new TrayEvent()
   // 注册全局快捷方式
   new GlobalShortcutEvent().registerAll()
-  // 自动更新逻辑
-  new AutoUpdater()
 
   /**
    * 主窗口关闭事件
@@ -150,7 +142,7 @@ function createWindow(): void {
 
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.ttime')
+  electronApp.setAppUserModelId('com.ruizhideng.ttime.community')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
