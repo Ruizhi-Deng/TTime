@@ -1,4 +1,4 @@
-# TTime Community
+# TTime Community 1.0.0
 
 当前分支 `reverse-0915` 基于公开的 0.9.2 源码，提供单用户本地版本。
 
@@ -37,7 +37,7 @@ GitHub Actions 生成 `TTime-windows-community`，包括安装程序与便携程
 - 同一翻译源可启用多个实例，各自配置名称、密钥和参数。请求、流式回调与历史按实例 ID 分开处理；新请求替换同一实例的旧请求。
 - OpenAI 接受完整 Chat Completions URL 和任意模型 ID，可接入兼容接口。可选密钥允许接入无鉴权的本地服务。
 - 新增 DeepSeek、Gemini 与智谱 GLM。AI 服务支持流式和非流式响应。
-- 本地提示词库支持新增、编辑、删除和实例独立选择，预置翻译、润色、总结、分析和解释代码。变量为 `{{text}}`、`{{source}}`、`{{target}}`。任务由所选提示词决定。
+- 本地提示词库支持新增、编辑、删除和实例独立选择，预置翻译、润色、总结、分析和解释代码。变量为 `{{text}}`、`{{source}}`、`{{target}}`，括号内可有空格。任务由所选提示词决定。
 - 配置保存与连接验证分开。模型名不使用固定下拉列表；请填写服务端实际提供的模型 ID。
 
 OpenAI、DeepSeek和智谱 填写完整请求 URL，原样保留路径与查询参数。Gemini 填写 API 基础地址，程序根据模型生成调用路径。
@@ -88,6 +88,10 @@ npm run test:ai
 
 `npm run prepare:ocr` 下载固定版本的中英模型；`npm run build` 自动先执行此步骤。模型下载使用已有代理设置。构建时支持 HTTPS_PROXY / HTTP_PROXY。`ocr/models/` 是生成目录，不提交模型二进制。
 
-`npm run test:ocr` 使用真实 ONNX 模型和固定图片，验证中英空格、变量名、四角坐标、倾斜识别、段落开关、空白图、会话复用、下载并发、离线缓存以及校验失败。界面测试验证 18 项翻译源、12 个 OCR 模型组、准备模型、合并开关和原图识别框。Windows 打包后还检查中英模型实际位于解包目录并验证 SHA-256。其他语言模型已验证下载、SHA-256、字符表与 ONNX 输出形状；尚未逐语言做真实文本准确率评测。Windows 快捷键、截图入口和用户实际截图仍需要桌面实测。
+`npm run test:ocr` 使用真实 ONNX 模型和固定图片，验证中英空格、变量名、四角坐标、倾斜识别、段落开关、空白图、会话复用、下载并发、离线缓存以及校验失败。界面测试验证 18 项翻译源、12 个 OCR 模型组、准备模型、合并开关和原图识别框。Windows 打包后还检查中英模型实际位于解包目录并验证 SHA-256。其他语言模型已验证下载、SHA-256、字符表与 ONNX 输出形状；尚未逐语言做真实文本准确率评测。用户已完成 Windows 交互实测并确认可用。
 
 模型来自 [RapidAI/RapidOCR](https://github.com/RapidAI/RapidOCR) 的固定 `v3.9.2` 模型资源，URL 与 SHA-256 见 `src/common/ocr/models.json`。算法依据 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 与 RapidOCR 的公开检测/识别流程重写。相关 Apache 2.0 许可保留在 `ocr/`。测试图片使用 Noto Sans CJK 字体渲染，测试输入文字为项目自建样例。
+
+## 第五阶段与交付
+
+用户已完成 Windows 交互测试并确认无问题。1.0.0 同时修正提示词变量说明与空格处理，发布安装版、便携版及 SHA-256 校验文件。正式版本见 [GitHub Releases](https://github.com/Ruizhi-Deng/TTime/releases)。
