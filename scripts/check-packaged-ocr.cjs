@@ -14,7 +14,7 @@ for (const language of registry.languages.filter((item) => ['ch', 'en'].includes
 }
 for (const id of ids) {
   const model = registry.models[id]
-  const relative = `ocr/models/${model.sha256}/${model.file}`
+  const relative = path.join('ocr', 'models', model.sha256, model.file)
   assert.equal(asar.statFile(archive, relative).unpacked, true)
   const bytes = fs.readFileSync(path.join(resources, 'app.asar.unpacked', relative))
   assert.equal(createHash('sha256').update(bytes).digest('hex'), model.sha256)
