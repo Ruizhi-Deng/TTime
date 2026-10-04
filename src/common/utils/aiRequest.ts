@@ -13,13 +13,28 @@ export interface AiRequestInfo {
   model: string
   requestUrl: string
   appKey: string
+  requestArguments?: string
   prompt: AiPrompt
   translateContent: string
   languageType: string
   languageResultType: string
 }
 
+export const parseRequestArguments = (value = ''): Record<string, unknown> => {
+  if (!value.trim()) return {}
+  let extraArgs: unknown
+  try {
+    extraArgs = JSON.parse(value)
+  } catch {
+    throw new Error('Request Arguments 必须是有效的 JSON 对象')
+  }
+  if (extraArgs === null || typeof extraArgs !== 'object' || Array.isArray(extraArgs))
+    throw new Error('Request Arguments 必须是 JSON 对象，例如 {"temperature":0.1}')
+  return extraArgs as Record<string, unknown>
+}
+
 export const buildAiRequest = (info: AiRequestInfo, stream: boolean) => {
+  const extraArgs = parseRequestArguments(info.requestArguments)
   const messages = buildPromptMessages(
     info.prompt,
     info.translateContent,
@@ -36,7 +51,8 @@ export const buildAiRequest = (info: AiRequestInfo, stream: boolean) => {
       }`,
       headers,
       body: {
-        ...(system ? { systemInstruction: { parts: [{ text: system.content }] } } : {}),
+        ...extraArgs,
+        systemInstruction: system ? { parts: [{ text: system.content }] } : undefined,
         contents: [{ role: 'user', parts: [{ text: messages[messages.length - 1].content }] }]
       }
     }
@@ -46,6 +62,7 @@ export const buildAiRequest = (info: AiRequestInfo, stream: boolean) => {
     url: info.requestUrl,
     headers,
     body: {
+      ...extraArgs,
       model: info.model,
       messages,
       stream

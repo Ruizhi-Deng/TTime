@@ -9,7 +9,8 @@ export default {
     model: '',
     requestUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
     aiPromptId: 'translate',
-    stream: true
+    stream: true,
+    requestArguments: ''
   },
   languageList
 }

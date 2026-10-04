@@ -9,7 +9,8 @@ export default {
     model: '',
     requestUrl: 'https://api.openai.com/v1/chat/completions',
     aiPromptId: 'translate',
-    stream: true
+    stream: true,
+    requestArguments: ''
   },
   languageList
 }

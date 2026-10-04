@@ -9,7 +9,8 @@ export default {
     model: '',
     requestUrl: 'https://generativelanguage.googleapis.com/v1beta',
     aiPromptId: 'translate',
-    stream: true
+    stream: true,
+    requestArguments: ''
   },
   languageList
 }

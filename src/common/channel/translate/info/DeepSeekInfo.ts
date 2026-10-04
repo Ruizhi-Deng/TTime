@@ -9,7 +9,8 @@ export default {
     model: '',
     requestUrl: 'https://api.deepseek.com/chat/completions',
     aiPromptId: 'translate',
-    stream: true
+    stream: true,
+    requestArguments: ''
   },
   languageList
 }

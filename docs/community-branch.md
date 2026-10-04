@@ -1,4 +1,4 @@
-# TTime Community 1.0.0
+# TTime Community 1.0.1
 
 当前分支 `reverse-0915` 基于公开的 0.9.2 源码，提供单用户本地版本。
 
@@ -45,6 +45,22 @@ OpenAI、DeepSeek和智谱 填写完整请求 URL，原样保留路径与查询�
 
 本版本使用 Chat Completions 协议连接 OpenAI 及兼容服务。已有 AI 实例可以在设置页重新选择提示词并填写完整接口地址。本应用不下载 AI 模型，也不提供共享密钥。
 
+四个 LLM 翻译源均提供 `Request Arguments` JSON 文本框，按实例保存。留空不添加参数；验证和翻译均使用该配置。填写的对象合并到请求体，模型、提示词与流式仍使用界面现有设置。保存及验证前校验 JSON 对象格式，其他参数按接口原样传递。
+
+OpenAI 兼容接口、DeepSeek、智谱示例：
+
+```json
+{"temperature":0.1,"top_p":0.99,"frequency_penalty":0,"presence_penalty":0,"reasoning_effort":"low"}
+```
+
+Gemini 示例（使用原生字段格式）：
+
+```json
+{"generationConfig":{"temperature":0.1,"topP":0.99}}
+```
+
+具体可用参数取决于所选服务和模型；应用不强制参数名单或取值范围。
+
 新增验证命令：
 
 ```sh
@@ -57,10 +73,10 @@ npm run test:ai
 
 | 翻译源 | 配置内容 |
 | --- | --- |
-| OpenAI / OpenAI 兼容接口 | 完整接口 URL、任意模型 ID、提示词、流式开关、可选 API Key |
-| DeepSeek | 完整接口 URL、模型 ID、API Key、提示词、流式开关 |
-| Gemini | API 基础地址、模型 ID、API Key、提示词、流式开关 |
-| 智谱 GLM | 完整接口 URL、模型 ID、API Key、提示词、流式开关 |
+| OpenAI / OpenAI 兼容接口 | 完整接口 URL、任意模型 ID、提示词、流式开关、可选 API Key、Request Arguments |
+| DeepSeek | 完整接口 URL、模型 ID、API Key、提示词、流式开关、Request Arguments |
+| Gemini | API 基础地址、模型 ID、API Key、提示词、流式开关、Request Arguments |
+| 智谱 GLM | 完整接口 URL、模型 ID、API Key、提示词、流式开关、Request Arguments |
 | 百度翻译 | AppId、密钥 |
 | 阿里云翻译 | AccessKey ID、AccessKey Secret |
 | Google 翻译 | API Key |

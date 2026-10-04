@@ -68,6 +68,10 @@ function localFetch(url, options) {
 async function main() {
   const prompts = loadSource('src/common/utils/aiPrompts.ts')
   const parser = loadSource('src/common/utils/aiRequest.ts')
+  assert.deepEqual(clone(parser.parseRequestArguments('')), {})
+  assert.deepEqual(clone(parser.parseRequestArguments('  ')), {})
+  for (const invalid of ['{', '[]', 'null', '3', '"text"'])
+    assert.throws(() => parser.parseRequestArguments(invalid), /JSON/)
   const textWithVariables = 'line 1\n{{target}} 🐱'
   const messages = clone(
     prompts.buildPromptMessages(prompts.defaultAiPrompts[0], textWithVariables, 'English', '中文')
@@ -201,6 +205,12 @@ async function main() {
     appKey: id + '-key',
     aiPromptId: 'translate',
     stream,
+    requestArguments: JSON.stringify({
+      temperature: 0.1,
+      top_p: 0.99,
+      reasoning_effort: 'low',
+      custom: { enabled: false }
+    }),
     translateContent: 'input',
     languageType: 'English',
     languageResultType: '中文'
@@ -237,6 +247,27 @@ async function main() {
       calls.find((call) => call.body.model === 'model-a').headers.authorization,
       'Bearer a-key'
     )
+    for (const call of calls) {
+      assert.equal(call.body.temperature, 0.1)
+      assert.equal(call.body.top_p, 0.99)
+      assert.equal(call.body.reasoning_effort, 'low')
+      assert.deepEqual(call.body.custom, { enabled: false })
+    }
+    const ownArguments = {
+      ...info('OpenAI', 'own'),
+      prompt: prompts.defaultAiPrompts[0],
+      requestArguments: JSON.stringify({
+        model: 'override',
+        messages: [],
+        stream: false,
+        temperature: 0
+      })
+    }
+    const ownRequest = parser.buildAiRequest(ownArguments, true)
+    assert.equal(ownRequest.body.model, 'model')
+    assert.equal(ownRequest.body.stream, true)
+    assert.equal(ownRequest.body.messages.length, 2)
+    assert.equal(ownRequest.body.temperature, 0)
     assert.ok(
       calls
         .filter((call) => call.url.startsWith('/chat'))
@@ -245,18 +276,36 @@ async function main() {
 
     await transport.requestAiTranslation({
       ...info('Gemini', 'gemini'),
-      requestUrl: base + '/gemini'
+      requestUrl: base + '/gemini',
+      requestArguments: JSON.stringify({
+        generationConfig: { temperature: 0.2, topP: 0.8, thinkingConfig: { thinkingBudget: 0 } },
+        contents: [],
+        systemInstruction: { parts: [{ text: 'override' }] }
+      })
     })
     assert.equal(
       calls.find((call) => call.url.startsWith('/gemini')).headers['x-goog-api-key'],
       'gemini-key'
     )
-    assert.ok(calls.find((call) => call.url.startsWith('/gemini')).body.systemInstruction)
+    const geminiBody = calls.find((call) => call.url.startsWith('/gemini')).body
+    assert.deepEqual(geminiBody.generationConfig, {
+      temperature: 0.2,
+      topP: 0.8,
+      thinkingConfig: { thinkingBudget: 0 }
+    })
+    assert.equal(geminiBody.contents.length, 1)
+    assert.notEqual(geminiBody.systemInstruction.parts[0].text, 'override')
     await transport.requestAiTranslation(info('OpenAI', 'non-stream', 'custom', false))
     await transport.requestAiTranslation({
       ...info('Gemini', 'gemini-json', 'gemini-model', false),
-      requestUrl: base + '/gemini'
+      requestUrl: base + '/gemini',
+      requestArguments: JSON.stringify({ generationConfig: { temperature: 0 } })
     })
+    assert.equal(
+      calls.find((call) => call.headers['x-goog-api-key'] === 'gemini-json-key').body
+        .generationConfig.temperature,
+      0
+    )
     await transport.requestAiTranslation({ ...info('OpenAI', 'check'), isTranslateCheckType: true })
     assert.equal(events.filter((event) => event.data.request.id === 'check').length, 1)
     assert.equal(

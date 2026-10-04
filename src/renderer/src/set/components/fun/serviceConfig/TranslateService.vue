@@ -98,6 +98,22 @@
           <el-form-item v-if="isAiService(translateServiceThis.type)" label="流式输出">
             <el-switch v-model="translateServiceThis.stream" />
           </el-form-item>
+          <el-form-item
+            v-if="isAiService(translateServiceThis.type)"
+            class="request-arguments-field"
+            label="Request Arguments"
+            label-width="100%"
+          >
+            <el-input
+              v-model="translateServiceThis.requestArguments"
+              type="textarea"
+              :autosize="{ minRows: 4, maxRows: 10 }"
+              :placeholder="requestArgumentsExample(translateServiceThis.type)"
+              spellcheck="false"
+            />
+            <span class="form-switch-span">填写接口支持的 JSON 请求参数，留空使用服务端默认值。模型、提示词和流式以现有设置为准。</span>
+            <span v-if="translateServiceThis.type === TranslateServiceEnum.GEMINI" class="form-switch-span">Gemini 生成参数放在 generationConfig 中；其他参数按 Gemini 接口格式填写。</span>
+          </el-form-item>
 
           <el-form-item
             v-if='
@@ -184,7 +200,7 @@ import { isNotNull, isNull } from '../../../../../../common/utils/validate'
 import TranslateServiceEnum from '../../../../../../common/enums/TranslateServiceEnum'
 import ElMessageExtend from '../../../../utils/messageExtend'
 import { REnum } from '../../../../enums/REnum'
-import { aiServiceTypes } from '../../../../../../common/utils/aiRequest'
+import { aiServiceTypes, parseRequestArguments } from '../../../../../../common/utils/aiRequest'
 import { cacheGet } from '../../../../utils/cacheUtil'
 
 // 翻译服务验证状态
@@ -218,6 +234,30 @@ const translateServiceSelectMenuList = ref(translateServiceSelectMenuListTemp)
 
 const aiPrompts = cacheGet('aiPrompts')
 const isAiService = (type: string): boolean => aiServiceTypes.includes(type)
+
+const requestArgumentsExample = (type: string): string =>
+  JSON.stringify(
+    type === TranslateServiceEnum.GEMINI
+      ? { generationConfig: { temperature: 0.1, topP: 0.99 } }
+      : {
+          temperature: 0.1,
+          top_p: 0.99,
+          frequency_penalty: 0,
+          presence_penalty: 0,
+          reasoning_effort: 'low'
+        }
+  )
+
+const checkRequestArguments = (): boolean => {
+  if (!isAiService(translateServiceThis.value.type)) return true
+  try {
+    parseRequestArguments(translateServiceThis.value.requestArguments)
+    return true
+  } catch (error: any) {
+    ElMessageExtend.warning(error.message)
+    return false
+  }
+}
 
 /**
  * 设置当前选中项默认为第一个翻译服务
@@ -297,6 +337,7 @@ const deleteTranslateService = (): void => {
  * 验证结果会通过调用返回给 apiCheckTranslateCallbackEvent 方法
  */
 const translateServiceCheckAndSave = (): void => {
+  if (!checkRequestArguments()) return
   const value = translateServiceThis.value
   const config = TranslateServiceBuilder.getServiceConfigInfo(value.type)
   if (config.keyRequired !== false && ((isNull(value.appId) && !config.isOneAppKey) || isNull(value.appKey))) {
@@ -389,6 +430,7 @@ const serviceUseStatusChange = (translateService): void => {
 onUnmounted(unsubscribeCheck)
 
 const saveCurrentService = (): void => {
+  if (!checkRequestArguments()) return
   saveService(translateServiceThis.value)
   window.api.updateTranslateServiceNotify()
   ElMessageExtend.success('配置已保存')
@@ -542,6 +584,18 @@ const serviceNameInput = (): void => {
 
     .translate-service-set {
       padding: 30px 20px 20px 20px;
+
+      .request-arguments-field {
+        display: block;
+
+        :deep(.el-form-item__label) {
+          justify-content: flex-start;
+        }
+
+        :deep(.el-textarea__inner) {
+          font-family: monospace;
+        }
+      }
 
       .translate-service-set-fun {
         display: flex;
