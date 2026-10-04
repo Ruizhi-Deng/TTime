@@ -3,7 +3,6 @@ dist
 out
 *.log*
 !/node_modules_update/**/dist
-package-lock.json
 
 # Log file
 *.log
