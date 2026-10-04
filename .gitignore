@@ -3,7 +3,6 @@ dist
 out
 *.log*
 !/node_modules_update/**/dist
-package-lock.json
 
 # Log file
 *.log
@@ -57,3 +56,6 @@ hs_err_pid*
 /.mvn/
 node_modules/
 /.history/
+
+# Downloaded, pinned OCR models
+/ocr/models/

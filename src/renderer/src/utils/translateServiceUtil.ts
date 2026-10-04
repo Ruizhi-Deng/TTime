@@ -9,19 +9,11 @@ import ServiceConfig from '../../../common/class/ServiceConfig'
  * @param translateServiceMap 翻译服务Map
  */
 export const setTranslateServiceMap = (translateServiceMap: Map<string, any>): void => {
-  if (translateServiceMap.size > 0) {
-    const translateServiceOne = translateServiceMap.entries().next().value[0]
-    if (isNull(translateServiceOne['index'])) {
-      let index = 0
-      translateServiceMap.forEach((translateService) => {
-        translateService['index'] = index
-        index++
-      })
-    }
-    translateServiceMap.forEach((translateService) => {
-      delete translateService.serviceInfo
-    })
-  }
+  let index = 0
+  translateServiceMap.forEach((service) => {
+    service.index = index++
+    delete service.serviceInfo
+  })
   const translateServiceMapFormat = Array.from(translateServiceMap.entries())
   cacheSet('translateServiceMap', translateServiceMapFormat)
   // 上面移除完毕保存后重新设置渠道信息
@@ -39,28 +31,7 @@ export const setTranslateServiceMap = (translateServiceMap: Map<string, any>): v
  * 获取翻译服务list
  */
 export const getTranslateServiceMap = (): Map<any, any> => {
-  let map: Map<any, any> = new Map(cacheGet('translateServiceMap'))
-  if (map.size > 0) {
-    // 因为之前的版本中的数据没有 index 所以这里默认获取第一条翻译源
-    // 看是否有设置 index 如果没有默认赋值一遍
-    const translateServiceOne = map.entries().next().value[0]
-    if (isNull(translateServiceOne['index'])) {
-      setTranslateServiceMap(map)
-    }
-
-    // 修复 Papago 翻译源类型配置为 PAPAGO 问题 改为 Papago 否则会因为大小写问题导致部分代码无法匹配
-    let updatePapago = false
-    map.forEach((translateService) => {
-      if (translateService['type'] === 'PAPAGO') {
-        translateService['type'] = TranslateServiceEnum.PAPAGO
-        updatePapago = true
-      }
-    })
-    if (updatePapago) {
-      setTranslateServiceMap(map)
-    }
-  }
-  map = new Map(cacheGet('translateServiceMap'))
+  let map = new Map(cacheGet('translateServiceMap'))
   // 将 Map 转换为包含键值对数组的二维数组
   const entries = Array.from(map.entries())
   // 对二维数组按照对象的 index 属性进行排序
@@ -97,6 +68,7 @@ export const buildTranslateService = (type: any): {} => {
     name: string
     // 是否需要秘钥
     isKey: boolean
+    keyRequired?: boolean
     // 是否单秘钥
     isOneAppKey: boolean
     // 构建时默认信息
@@ -191,6 +163,7 @@ export class TranslateServiceBuilder {
     name: string
     // 是否需要秘钥
     isKey: boolean
+    keyRequired?: boolean
     // 是否单秘钥
     isOneAppKey: boolean
     // 构建时默认信息

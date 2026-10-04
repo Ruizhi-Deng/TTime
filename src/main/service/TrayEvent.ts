@@ -3,7 +3,6 @@ import { isNotNull } from '../../common/utils/validate'
 import * as path from 'path'
 import { SystemTypeEnum } from '../enums/SystemTypeEnum'
 import createSetWindow from './Set'
-import AutoUpdater from './AutoUpdater'
 import log from '../utils/log'
 import { GlobalShortcutEvent } from './GlobalShortcutEvent'
 import GlobalWin from './GlobalWin'
@@ -53,14 +52,13 @@ class TrayEvent {
       {
         label: '使用教程',
         click: (): void => {
-          shell.openExternal('https://ttime.timerecord.cn')
+          shell.openExternal('https://github.com/Ruizhi-Deng/TTime')
         }
       },
       {
-        label: '检查更新',
+        label: '下载维护版本',
         click: (): void => {
-          // 自动更新逻辑
-          AutoUpdater.startCheck(false)
+          shell.openExternal('https://github.com/Ruizhi-Deng/TTime/releases')
         }
       },
       {

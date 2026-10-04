@@ -6,9 +6,6 @@
       <el-aside width="200px">
         <el-scrollbar>
           <el-menu :default-active="menuIndex" @select="menuSelect">
-            <el-menu-item index="myInfo">
-              <span class="none-select">我的</span>
-            </el-menu-item>
             <el-menu-item index="basiInfo">
               <span class="none-select">偏好设置</span>
             </el-menu-item>
@@ -23,6 +20,9 @@
             </el-menu-item>
             <el-menu-item index="translateServiceConfig">
               <span class="none-select">翻译源设置</span>
+            </el-menu-item>
+            <el-menu-item index="aiPrompts">
+              <span class="none-select">AI 提示词</span>
             </el-menu-item>
             <el-menu-item index="networkSet">
               <span class="none-select">网络设置</span>
@@ -40,12 +40,12 @@
       <el-container>
         <el-main class="main">
           <el-scrollbar>
-            <my-info v-if="menuIndex === 'myInfo'" />
             <basi-info v-if="menuIndex === 'basiInfo'" />
             <advanced-info v-else-if="menuIndex === 'advancedInfo'" />
             <shortcut-key v-else-if="menuIndex === 'shortcutKey'" />
             <translate-history v-else-if="menuIndex === 'translateHistory'" />
             <translate-service-config v-else-if="menuIndex === 'translateServiceConfig'" />
+            <ai-prompts v-else-if="menuIndex === 'aiPrompts'" />
             <network-set v-else-if="menuIndex === 'networkSet'" />
             <config-file v-else-if="menuIndex === 'configFile'" />
             <about v-else-if="menuIndex === 'about'" />
@@ -58,12 +58,12 @@
 
 <script lang="ts" setup>
 import Header from './components/Header.vue'
-import MyInfo from './components/fun/MyInfo.vue'
 import BasiInfo from './components/fun/BasiInfo.vue'
 import AdvancedInfo from './components/fun/AdvancedInfo.vue'
 import ShortcutKey from './components/fun/ShortcutKey.vue'
 import TranslateHistory from './components/fun/TranslateHistory.vue'
 import TranslateServiceConfig from './components/fun/TranslateServiceConfig.vue'
+import AiPrompts from './components/fun/AiPrompts.vue'
 import NetworkSet from './components/fun/NetworkSet.vue'
 import ConfigFile from './components/fun/ConfigFile.vue'
 import About from './components/fun/About.vue'
@@ -81,7 +81,7 @@ const getPageMenuIndex = (): string => {
   // 读取后缓存数据
   cacheDelete('setPageMenuIndex')
   // 如果菜单索引为空则默认展示偏好设置
-  return isNull(setPageMenuIndex) ? 'myInfo' : setPageMenuIndex
+  return isNull(setPageMenuIndex) ? 'basiInfo' : setPageMenuIndex
 }
 
 /**

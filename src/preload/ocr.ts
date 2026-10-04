@@ -63,6 +63,11 @@ const updateTranslatedContentEvent = (text): void => {
 
 // Custom APIs for renderer
 const api = {
+  updateOcrResult: (callback) => {
+    const listener = (_event, result) => callback(result)
+    ipcRenderer.on('update-ocr-result', listener)
+    return () => ipcRenderer.removeListener('update-ocr-result', listener)
+  },
   ...common,
   closeOcrWinEvent,
   ocrAlwaysOnTopEvent,

@@ -72,7 +72,7 @@ const isScreenshotEnd = ref(false)
 const translateContent = ref('')
 // 翻译输入框ref
 const translateContentInputRef = ref()
-const emit = defineEmits(['show-result-event', 'is-result-loading-event'])
+const emit = defineEmits(['show-result-event', 'is-result-loading-event', 'request-id-event'])
 
 watch(translateContent, () => {
   // 页面高度改变监听
@@ -219,8 +219,6 @@ const translateFun = (): void => {
   }
   // 设置显示翻译加载中状态
   emit('is-result-loading-event', true)
-  // 应用翻译使用
-  window.api.ttimeApiTranslateUse()
   // 获取当前正在使用的翻译源
   const translateServiceMapData = getTranslateServiceMapByUse()
   // 构建翻译记录信息
@@ -230,6 +228,7 @@ const translateFun = (): void => {
     resultLanguage
   })
   const requestMap = new Map()
+  emit('request-id-event', translateRecordVo.requestId)
   // 遍历当前正在使用的翻译源
   for (const translateService of translateServiceMapData.values()) {
     // 翻译源类型
@@ -240,7 +239,7 @@ const translateFun = (): void => {
     })
     if (isNull(inputServiceLanguage)) {
       // 此处校验是用于用户在使用多翻译源情况下 部分翻译源支持某种语言 而部分翻译源不支持
-      window.api.apiTranslateResultMsgCallbackEvent(translateService.type, '不支持翻译当前语言')
+      window.api.apiTranslateResultMsgCallbackEvent(translateService.type, '不支持翻译当前语言', { id: translateService.id, requestId: translateRecordVo.requestId })
       continue
     }
     // 输入文字语言类型
@@ -250,7 +249,7 @@ const translateFun = (): void => {
       return service.type === translateService.type
     })
     if (isNull(resultServiceLanguage)) {
-      window.api.apiTranslateResultMsgCallbackEvent(translateService.type, '不支持翻译当前语言结果')
+      window.api.apiTranslateResultMsgCallbackEvent(translateService.type, '不支持翻译当前语言结果', { id: translateService.id, requestId: translateRecordVo.requestId })
       continue
     }
     // 翻译结果语言类型
@@ -265,6 +264,8 @@ const translateFun = (): void => {
       ...info,
       requestId: translateRecordVo.requestId,
       id: translateService.id,
+      type,
+      serviceName: translateService.serviceName,
       appId: translateService.appId,
       appKey: translateService.appKey
     }
@@ -274,16 +275,17 @@ const translateFun = (): void => {
         info[key] = translateService[key]
       })
     }
-    requestMap.set(type, info)
+    requestMap.set(translateService.id, info)
   }
   // 翻译记录状态
   const translateHistoryStatus = cacheGet('translateHistoryStatus') === YesNoEnum.Y
   if (translateHistoryStatus) {
     // 构建翻译记录信息
     const translateServiceRecordList = []
-    requestMap.forEach((value, key) => {
+    requestMap.forEach((value) => {
       const serviceRecordVo = new TranslateServiceRecordVo()
-      serviceRecordVo.translateServiceType = key
+      serviceRecordVo.translateServiceType = value.type
+      serviceRecordVo.translateServiceName = value.serviceName
       serviceRecordVo.translateServiceId = value.id
       serviceRecordVo.translateStatus = false
       translateServiceRecordList.push(serviceRecordVo)
@@ -296,9 +298,9 @@ const translateFun = (): void => {
     updateTranslateRecordList(translateRecordList)
   }
   // 触发翻译
-  requestMap.forEach((value, key) => {
+  requestMap.forEach((value) => {
     // 此处触发之后会异步回调到 *ApiTranslateCallbackEvent 方法中去执行
-    window.api.apiUniteTranslate(key, value)
+    window.api.apiUniteTranslate(value.type, value)
   })
 }
 

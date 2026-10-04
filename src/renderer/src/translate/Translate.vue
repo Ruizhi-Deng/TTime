@@ -5,6 +5,7 @@
       <Input
         ref='translateInput'
         @show-result-event='(value) => translatedResultInput.setShowResult(value)'
+        @request-id-event='(value) => translatedResultInput.setRequestId(value)'
         @is-result-loading-event='(value) => translatedResultInput.setIsResultLoading(value)'
         v-show='!hideTranslateInput'
       />
@@ -31,11 +32,10 @@ import { isNull } from '../../../common/utils/validate'
 import { buildTranslateService, setTranslateServiceMap } from '../utils/translateServiceUtil'
 import { buildOcrService, setOcrServiceMap } from '../utils/ocrServiceUtil'
 import { initTheme } from '../utils/themeUtil'
-import { cacheGet, oldCacheGet } from '../utils/cacheUtil'
+import { cacheGet } from '../utils/cacheUtil'
 import '../channel/ChannelRequest'
 import TranslateServiceEnum from '../../../common/enums/TranslateServiceEnum'
 import OcrServiceEnum from '../../../common/enums/OcrServiceEnum'
-import { loadNewServiceInfo } from '../utils/memberUtil'
 import { YesNoEnum } from '../../../common/enums/YesNoEnum'
 
 initTheme()
@@ -46,13 +46,8 @@ const translatedResultInput = ref('')
 const hideTranslateInput = ref(false)
 const hideTranslateLanguage = ref(false)
 
-// 应用启动
-window.api.ttimeApiAppStart()
-
 // 页面高度改变监听
 window.api.pageHeightChangeEvent()
-
-loadNewServiceInfo()
 
 // 清空翻译输入、结果内容事件
 window.api.clearAllTranslateContentEvent(() => {
@@ -76,45 +71,20 @@ window.api.winShowByInputEvent(() => {
  * 初始化默认翻译服务
  */
 if (isNull(cacheGet('translateServiceMap'))) {
-  const translateServiceMap = oldCacheGet('translateServiceMap')
-  if (undefined !== translateServiceMap) {
-    // 兼容浏览器存储方式的数据 导入到文件存储里去
-    setTranslateServiceMap(new Map(translateServiceMap))
-  } else {
-    const map = new Map()
-    const ttimeService = buildTranslateService(TranslateServiceEnum.TTIME)
-    map.set(ttimeService.id, ttimeService)
-    setTranslateServiceMap(map)
-
-    const bingDictService = buildTranslateService(TranslateServiceEnum.BING_DICT)
-    map.set(bingDictService.id, bingDictService)
-    setTranslateServiceMap(map)
-
-    const deepLBuiltInService = buildTranslateService(TranslateServiceEnum.DEEP_L_BUILT_IN)
-    map.set(deepLBuiltInService.id, deepLBuiltInService)
-    setTranslateServiceMap(map)
-
-    const niuTransBuiltInService = buildTranslateService(TranslateServiceEnum.NIU_TRANS_BUILT_IN)
-    map.set(niuTransBuiltInService.id, niuTransBuiltInService)
-    setTranslateServiceMap(map)
+  const map = new Map()
+  for (const type of [TranslateServiceEnum.GOOGLE_BUILT_IN, TranslateServiceEnum.BING_DICT, TranslateServiceEnum.DEEP_L_BUILT_IN]) {
+    const service = buildTranslateService(type)
+    map.set(service.id, service)
   }
+  setTranslateServiceMap(map)
 }
 
 /**
- * Ocr服务list 如果不存在则说明第一次打开
- * 初始化默认Ocr服务
+ * 首次打开时初始化本地 OCR 服务
  */
 if (isNull(cacheGet('ocrServiceMap'))) {
-  const ocrServiceMap = oldCacheGet('ocrServiceMap')
-  if (undefined !== ocrServiceMap) {
-    // 兼容浏览器存储方式的数据 导入到文件存储里去
-    setOcrServiceMap(new Map(ocrServiceMap))
-  } else {
-    const map = new Map()
-    const ttimeService = buildOcrService(OcrServiceEnum.TTIME)
-    map.set(ttimeService.id, ttimeService)
-    setOcrServiceMap(map)
-  }
+  const service = buildOcrService(OcrServiceEnum.TTIME)
+  setOcrServiceMap(new Map([[service.id, service]]))
 }
 
 /**

@@ -10,7 +10,6 @@ import { SystemTypeEnum } from '../enums/SystemTypeEnum'
 import TranslateShowPositionEnum from '../../common/enums/TranslateShowPositionEnum'
 import log from '../utils/log'
 import StoreService from './StoreService'
-import createSetWindow from './Set'
 
 /**
  * 全局窗口
@@ -412,18 +411,6 @@ class GlobalWin {
     // 设置悬浮窗可关闭
     GlobalWin.isOcrWinClose = true
     app.quit()
-  }
-
-  /**
-   * 强制显示设置窗口
-   */
-  static forceShowSetWin() {
-    if (isNull(GlobalWin.setWin)) {
-      createSetWindow()
-    }
-    GlobalWin.winShow(GlobalWin.setWin)
-    GlobalWin.setWin.focus()
-    GlobalWin.setWin.webContents.send('refresh-user-info-event')
   }
 
 }

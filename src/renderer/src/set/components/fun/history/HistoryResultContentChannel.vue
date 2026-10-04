@@ -5,7 +5,7 @@
         <div class="content-tools-category">
           <img class="content-translate-logo none-select" :src="serviceInfo.logo" />
           <span class="content-translate-name none-select">
-            {{ serviceInfo.name }}
+            {{ translateServiceRecordVoThis.translateServiceName || serviceInfo.name }}
           </span>
         </div>
         <div class="function-tools-category content-tools-category">

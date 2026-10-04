@@ -3,21 +3,6 @@
  */
 class TranslateServiceEnum {
   /**
-   * TTime翻译
-   */
-  static TTIME = 'TTime'
-
-  /**
-   * TTimeAI翻译
-   */
-  static TTIME_AI = 'TTimeAI'
-
-  /**
-   * 腾讯翻译君
-   */
-  static TENCENT_CLOUD = 'TencentCloud'
-
-  /**
    * 百度翻译
    */
   static BAIDU = 'Baidu'
@@ -42,10 +27,9 @@ class TranslateServiceEnum {
    */
   static OPEN_AI = 'OpenAI'
 
-  /**
-   * AzureOpenAI翻译
-   */
-  static AZURE_OPEN_AI = 'AzureOpenAI'
+  static DEEP_SEEK = 'DeepSeek'
+  static GEMINI = 'Gemini'
+  static ZHIPU = 'Zhipu'
 
   /**
    * 有道翻译
@@ -83,11 +67,6 @@ class TranslateServiceEnum {
   static NIU_TRANS = 'NiuTrans'
 
   /**
-   * 小牛翻译(内置)
-   */
-  static NIU_TRANS_BUILT_IN = 'NiuTransBuiltIn'
-
-  /**
    * 彩云翻译
    */
   static CAI_YUN = 'CaiYun'
@@ -98,15 +77,9 @@ class TranslateServiceEnum {
   static TRAN_SMART = 'TranSmart'
 
   /**
-   * Papago翻译
-   */
-  static PAPAGO = 'Papago'
-
-  /**
    * 简明英汉词典(内置)
    */
   static EC_DICT = 'EcDict'
-
 }
 
 export default TranslateServiceEnum

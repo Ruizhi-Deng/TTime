@@ -5,23 +5,19 @@ import TranslateShowPositionEnum from '../../common/enums/TranslateShowPositionE
 import { YesNoEnum } from '../../common/enums/YesNoEnum'
 import { PlaySpeechServiceEnum } from '../../common/enums/PlaySpeechServiceEnum'
 import { ShortcutKeyEnum } from '../../common/enums/ShortcutKeyEnum'
-import { isNotNull, isNull } from '../../common/utils/validate'
+import { isNull } from '../../common/utils/validate'
 import { GlobalShortcutEvent } from './GlobalShortcutEvent'
 import { WinEvent } from './Win'
 import log from '../utils/log'
-import GlobalWin from './GlobalWin'
-import { LoginStatusEnum } from '../../common/enums/LoginStatusEnum'
-import TTimeRequest from './channel/interfaces/TTimeRequest'
-import MemberUtil from '../utils/memberUtil'
-import commonUtil from '../utils/commonUtil'
 import * as fse from 'fs-extra'
+import { defaultAiPrompts } from '../../common/utils/aiPrompts'
 
 /**
  * app.getPath('userData')
  *
  * 一般对应地址如下 :
- * Mac : Users/用户账号名称/Library/Application Support/time-translate/
- * Win : C:\Users\用户账号名称\AppData\Roaming\time-translate/
+ * Mac : Users/用户账号名称/Library/Application Support/TTime Community/
+ * Win : C:\Users\用户账号名称\AppData\Roaming\TTime Community/
  */
 class StoreService {
   /**
@@ -48,30 +44,6 @@ class StoreService {
    * 用户数据存放文件夹名称
    */
   static userDataConfigFolderName = 'userDataConfig'
-
-  /**
-   * 云配置不上传白名单 - 不应同步的配置
-   */
-  static cloudConfigKeyWhiteList: Array<string> = [
-    'inputShortcutKey',
-    'screenshotShortcutKey',
-    'choiceShortcutKey',
-    'showOcrShortcutKey',
-    'screenshotOcrShortcutKey',
-    'screenshotSilenceOcrShortcutKey',
-    'agentConfig',
-    'translateChoiceDelay',
-    'inputLanguage',
-    'resultLanguage',
-    'loginStatus',
-    'translateServiceMap',
-    'ocrServiceMap',
-    'translateServiceKey',
-    'token',
-    'userInfo',
-    'mainWinWidth',
-    'setPageMenuIndex'
-  ]
 
   /**
    * 配置路径
@@ -136,6 +108,11 @@ class StoreService {
   }
 
   static initConfig = (): void => {
+    if (!StoreService.configHas('localOcrLanguage')) StoreService.configSet('localOcrLanguage', 'ch')
+    if (!StoreService.configHas('localOcrMergeParagraphs')) StoreService.configSet('localOcrMergeParagraphs', true)
+    if (!StoreService.configHas('aiPrompts')) {
+      StoreService.configSet('aiPrompts', defaultAiPrompts)
+    }
     // 首次打开时设置默认快捷键
     if (!StoreService.configHas('inputShortcutKey')) {
       StoreService.configSet('inputShortcutKey', 'Alt + Q')
@@ -173,10 +150,6 @@ class StoreService {
       })
     }
 
-    // 初始化自动更新事件
-    if (!StoreService.configHas('autoUpdater')) {
-      StoreService.configSet('autoUpdater', YesNoEnum.Y)
-    }
     // 语音播放源
     if (!StoreService.configHas('playSpeechService')) {
       StoreService.configSet('playSpeechService', PlaySpeechServiceEnum.TTIME)
@@ -236,14 +209,6 @@ class StoreService {
     if (!StoreService.configHas('inputTranslationAutoStatus')) {
       StoreService.configSet('inputTranslationAutoStatus', YesNoEnum.N)
     }
-    // 初始化登录状态
-    if (!StoreService.configHas('loginStatus')) {
-      StoreService.configSet('loginStatus', LoginStatusEnum.N)
-    }
-    // 初始化服务端口
-    if (!StoreService.configHas('servicePort')) {
-      StoreService.configSet('servicePort', 11223)
-    }
     // 隐藏翻译输入框
     if (!StoreService.configHas('hideTranslateInput')) {
       StoreService.configSet('hideTranslateInput', YesNoEnum.N)
@@ -254,11 +219,11 @@ class StoreService {
     }
     // 翻译结果显示复制驼峰格式按钮
     if (!StoreService.configHas('copyCamelCaseResultStatus')) {
-      StoreService.configSet('copyCamelCaseResultStatus', LoginStatusEnum.N)
+      StoreService.configSet('copyCamelCaseResultStatus', YesNoEnum.N)
     }
     // 翻译结果显示复制下划线格式按钮
     if (!StoreService.configHas('copySnakeCaseResultStatus')) {
-      StoreService.configSet('copySnakeCaseResultStatus', LoginStatusEnum.N)
+      StoreService.configSet('copySnakeCaseResultStatus', YesNoEnum.N)
     }
     app.whenReady().then(async () => {
       const translateShortcutKeyList = [
@@ -296,18 +261,8 @@ class StoreService {
       })
       log.info('[初始加载翻译快捷键事件] - 结束')
 
-      setTimeout(async () => {
-        let autoLaunchFront = StoreService.configGet('autoLaunchFront')
-        if (isNull(autoLaunchFront)) {
-          // 如果首次从 localStorage 存储环境切换到 store 方式存储时
-          // 静默更新状态下会获取不到自动开机状态
-          // 所以当 autoLaunchFront 为空的情况下则再从 localStorage 读取初始状态
-          await GlobalWin.mainWin.webContents
-            .executeJavaScript('localStorage.autoLaunchFront')
-            .then((valExtend) => {
-              autoLaunchFront = valExtend
-            })
-        }
+      setTimeout(() => {
+        const autoLaunchFront = StoreService.configGet('autoLaunchFront')
         if (isNull(autoLaunchFront)) {
           log.info('开机自启初始化事件')
           // 延迟检测 防止注册表还没有完全添加完毕状态下就获取了
@@ -318,60 +273,6 @@ class StoreService {
         }
       }, 5000)
     })
-  }
-
-  /**
-   * 加载云端配置
-   */
-  static initCloudConfig = (): void => {
-    if (MemberUtil.isNotMemberVip()) {
-      return
-    }
-    log.info('[ 加载云端配置 ] - 开始')
-    // 本地配置对象
-    const thisConfigObject = StoreService.configStore.store
-    // 获取本地配置对象对应键列表
-    const thisConfigKeyList = Object.keys(thisConfigObject).filter(
-      (key) => !StoreService.cloudConfigKeyWhiteList.includes(key)
-    )
-    // 拉取所有最新配置
-    TTimeRequest.getUserConfig().then((res: any): void => {
-      if (res['status'] !== 200) {
-        log.info('[ 加载云端配置 ] - 登录已失效')
-        TTimeRequest.logout().then()
-        return
-      }
-      // 云端配置 转换为对象格式
-      const cloudConfigObject = res.data.reduce((acc: any, cur: any) => {
-        acc[cur.configKey] = cur.configValue
-        return acc
-      }, {})
-      // 云端配置 key 列表
-      const cloudConfigKeyList = Object.keys(cloudConfigObject)
-      // 筛选本地存在 云端不存在的配置
-      const newConfigKeyList = thisConfigKeyList.filter((key) => !cloudConfigKeyList.includes(key))
-      // 构建本地存在云端不存在的数据
-      const newConfigList = newConfigKeyList.map((key) => ({
-        configKey: key,
-        configValue: thisConfigObject?.[key] ?? null
-      }))
-      if (isNotNull(newConfigList) && newConfigList.length > 0) {
-        log.info('[ 加载云端配置 ] - 更新配置信息开始')
-        // 保存新配置数据
-        TTimeRequest.batchSaveUserConfig({
-          configList: newConfigList
-        }).then()
-        log.info('[ 加载云端配置 ] - 更新配置信息结束')
-      }
-      // 云端配置覆盖本地配置
-      cloudConfigKeyList.forEach((key) => {
-        const value = cloudConfigObject[key]
-        if (isNotNull(value)) {
-          StoreService.configSetNotCloud(key, commonUtil.convertToNumber(value))
-        }
-      })
-    })
-    log.info('[ 加载云端配置 ] - 结束')
   }
 
   static systemHas = (key: string): boolean => {
@@ -398,18 +299,8 @@ class StoreService {
     return StoreService.configStore.get(key)
   }
 
-  static configSetNotCloud = (key: string, val: any): void => {
-    StoreService.configStore.set(key, val)
-  }
-
   static configSet = (key: string, val: any): void => {
-    StoreService.configSetNotCloud(key, val)
-    if (MemberUtil.isMemberVip() && !StoreService.cloudConfigKeyWhiteList.includes(key)) {
-      TTimeRequest.saveUserConfig({
-        configKey: key,
-        configValue: val
-      }).then()
-    }
+    StoreService.configStore.set(key, val)
   }
 
   static configDeleteByKey = (key: string): void => {

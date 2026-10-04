@@ -2,9 +2,6 @@ import { cacheGetByType, cacheSetByType } from './cacheUtil'
 import { StoreTypeEnum } from '../../../common/enums/StoreTypeEnum'
 import TranslateRecordVo from '../../../common/class/TranslateRecordVo'
 import { isNull } from '../../../common/utils/validate'
-import TranslateServiceRecordVo from '../../../common/class/TranslateServiceRecordVo'
-import { translateRecordSave, TranslateRecordSavePo } from '../api/translateRecord'
-import { isMemberVip } from './memberUtil'
 
 /**
  * 更新翻译记录
@@ -14,7 +11,7 @@ import { isMemberVip } from './memberUtil'
 export const updateTranslateRecord = (translateVo): void => {
   let requestId = translateVo['requestId']
   // 翻译记录
-  const translateRecordList = cacheGetByType(StoreTypeEnum.HISTORY_RECORD, 'translateRecordList')
+  const translateRecordList = getTranslateRecordList()
   for (let i = 0; i < translateRecordList.length; i++) {
     const translateRecord = translateRecordList[i]
     if (translateRecord['requestId'] === requestId) {
@@ -28,11 +25,6 @@ export const updateTranslateRecord = (translateVo): void => {
           delete newTranslateInfo.requestId
           translateServiceRecord['translateVo'] = newTranslateInfo
           translateServiceRecord.translateStatus = true
-        }
-      }
-      if(isMemberVip()) {
-        if(translateServiceRecordList.every((translateServiceRecord: TranslateServiceRecordVo) => translateServiceRecord.translateStatus)) {
-          translateRecordSave(TranslateRecordSavePo.build(translateRecord)).then(() => {})
         }
       }
     }
@@ -64,11 +56,6 @@ export const getTranslateRecordSize = (): number => {
  * @return 翻译记录列表
  */
 export const updateTranslateRecordList = (translateRecordList): void => {
-  const translateRecordSize = translateRecordList.length
-  // 如果数组的长度超过了30，移除第一个元素
-  if (translateRecordSize >= 30) {
-    translateRecordList.shift()
-  }
-  cacheSetByType(StoreTypeEnum.HISTORY_RECORD, 'translateRecordSize', translateRecordSize)
+  cacheSetByType(StoreTypeEnum.HISTORY_RECORD, 'translateRecordSize', translateRecordList.length)
   cacheSetByType(StoreTypeEnum.HISTORY_RECORD, 'translateRecordList', translateRecordList)
 }

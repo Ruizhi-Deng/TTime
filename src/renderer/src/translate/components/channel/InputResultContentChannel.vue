@@ -125,10 +125,10 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, onUnmounted, ref, watch } from 'vue'
 import loadingImage from '../../../assets/loading.gif'
 import translate from '../../../utils/translate'
-import TranslateServiceEnum from '../../../../../common/enums/TranslateServiceEnum'
+import { aiServiceTypes } from '../../../../../common/utils/aiRequest'
 import { isNull } from '../../../../../common/utils/validate'
 import { OpenAIStatusEnum } from '../../../../../common/enums/OpenAIStatusEnum'
 import { updateTranslateRecord } from '../../../utils/translateRecordUtil'
@@ -166,6 +166,7 @@ const loadingImageSrc = ref(loadingImage)
 const translateServiceThis = ref(props.translateService)
 
 // 翻译结果
+let activeRequestId = ''
 const translatedResultContent = ref('')
 const dictTranslatedResultExpand = ref({})
 // 是否正在加载翻译结果
@@ -234,11 +235,19 @@ const copySnakeCase = (text): void => {
 /**
  * 翻译回调 - 异步处理
  */
-window.api[getTranslateServiceBackEventName(props.translateService)]((res) => {
+const unsubscribe = window.api[getTranslateServiceBackEventName(props.translateService)]((res) => {
   const data = res.data
+  if (data.translateServiceId !== translateServiceThis.value['id'] || data.requestId !== activeRequestId) return
   const translateList = data['translateList']
   const translatedResultContentTemp = translateList.join('\n')
   if (isStreamTranslateService()) {
+    if (res.code === OpenAIStatusEnum.ERROR) {
+      translatedResultContent.value = translatedResultContentTemp
+      showResult.value = true
+      isResultLoading.value = false
+      adjustTextareaHeight()
+      return
+    }
     if (res.code === OpenAIStatusEnum.START) {
       translatedResultContent.value = ''
       return
@@ -247,7 +256,7 @@ window.api[getTranslateServiceBackEventName(props.translateService)]((res) => {
       translatedResultContent.value += translatedResultContentTemp
       showResult.value = true
       isResultLoading.value = false
-      copySpecialResultShow.value = isEnglish(translatedResultContentTemp)
+      copySpecialResultShow.value = isEnglish(translatedResultContent.value)
       data.translateList = [translatedResultContent.value]
       // 更新翻译记录
       updateTranslateRecord(data)
@@ -340,6 +349,7 @@ const setIsResultLoading = (value): void => {
  * 清空翻译结果内容事件
  */
 const clearTranslatedResultContentEvent = (): void => {
+  activeRequestId = ''
   isResultLoading.value = false
   showResult.value = false
   setTranslatedResultContent('')
@@ -377,12 +387,7 @@ watch(translatedResultContent, () => {
  * 是否流式翻译服务
  */
 const isStreamTranslateService = (): boolean => {
-  const type = props.translateService['type']
-  return (
-    TranslateServiceEnum.OPEN_AI === type ||
-    TranslateServiceEnum.AZURE_OPEN_AI === type ||
-    TranslateServiceEnum.TTIME_AI === type
-  )
+  return aiServiceTypes.includes(props.translateService['type'])
 }
 
 /**
@@ -392,7 +397,14 @@ window.api.winSizeUpdate(() => {
   adjustTextareaHeight()
 })
 
+onUnmounted(unsubscribe)
+
+const setRequestId = (requestId: string): void => {
+  activeRequestId = requestId
+}
+
 defineExpose({
+  setRequestId,
   setTranslatedResultContent,
   clearTranslatedResultContentEvent,
   setShowResult,
