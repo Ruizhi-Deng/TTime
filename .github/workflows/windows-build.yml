@@ -1,0 +1,48 @@
+name: Windows baseline build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - reverse-0915
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.20.2
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Apply patched node modules
+        run: npm run modules-update
+
+      - name: Build Electron app
+        run: npm run build
+
+      - name: Package NSIS installer
+        run: npx electron-builder --win nsis --config --publish never
+
+      - name: Package portable build
+        run: npx electron-builder --win portable --config --publish never
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: TTime-windows-baseline
+          path: |
+            dist/*.exe
+            dist/*.yml
+          if-no-files-found: error
