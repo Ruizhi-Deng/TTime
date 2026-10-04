@@ -2,12 +2,6 @@
  * 翻译服务枚举
  */
 class TranslateServiceEnum {
-
-  /**
-   * 腾讯翻译君
-   */
-  static TENCENT_CLOUD = 'TencentCloud'
-
   /**
    * 百度翻译
    */
@@ -34,15 +28,8 @@ class TranslateServiceEnum {
   static OPEN_AI = 'OpenAI'
 
   static DEEP_SEEK = 'DeepSeek'
-  static OLLAMA = 'Ollama'
   static GEMINI = 'Gemini'
   static ZHIPU = 'Zhipu'
-  static DEEP_LX = 'DeepLX'
-
-  /**
-   * AzureOpenAI翻译
-   */
-  static AZURE_OPEN_AI = 'AzureOpenAI'
 
   /**
    * 有道翻译
@@ -90,15 +77,9 @@ class TranslateServiceEnum {
   static TRAN_SMART = 'TranSmart'
 
   /**
-   * Papago翻译
-   */
-  static PAPAGO = 'Papago'
-
-  /**
    * 简明英汉词典(内置)
    */
   static EC_DICT = 'EcDict'
-
 }
 
 export default TranslateServiceEnum

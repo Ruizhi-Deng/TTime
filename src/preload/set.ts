@@ -145,6 +145,8 @@ const winShowEvent = (callback): void => {
 }
 
 const api = {
+  localOcrModelStatus: (language: string) => ipcRenderer.invoke('local-ocr-model-status', language),
+  prepareLocalOcrModels: (language: string) => ipcRenderer.invoke('prepare-local-ocr-models', language),
   ...common,
   updateTranslateShortcutKeyEvent,
   closeSetWinEvent,

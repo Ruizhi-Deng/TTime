@@ -197,6 +197,7 @@
           </div>
           <span class='form-switch-span'> 验证成功后将会保存配置信息 </span>
         </el-form>
+        <local-ocr-settings v-else-if="ocrServiceThis.type === OcrServiceEnum.TTIME" />
         <span v-else class='form-switch-span'>内置文本识别 - 无需配置</span>
       </div>
     </div>
@@ -204,6 +205,7 @@
 </template>
 <script setup lang='ts'>
 import { ref } from 'vue'
+import LocalOcrSettings from './LocalOcrSettings.vue'
 import { Minus, Plus } from '@element-plus/icons-vue'
 
 import {

@@ -1,0 +1,160 @@
+{
+  "source": "RapidAI/RapidOCR default_models.yaml, model release v3.9.2 (PP-OCRv4 family)",
+  "models": {
+    "ch_PP-OCRv4_det_mobile": {
+      "file": "ch_PP-OCRv4_det_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/det/ch_PP-OCRv4_det_mobile.onnx",
+      "sha256": "d2a7720d45a54257208b1e13e36a8479894cb74155a5efe29462512d42f49da9"
+    },
+    "en_PP-OCRv3_det_mobile": {
+      "file": "en_PP-OCRv3_det_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/det/en_PP-OCRv3_det_mobile.onnx",
+      "sha256": "ea07c15d38ac40cd69da3c493444ec75b44ff23840553ff8ba102c1219ed39c2"
+    },
+    "multi_PP-OCRv3_det_mobile": {
+      "file": "multi_PP-OCRv3_det_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/det/multi_PP-OCRv3_det_mobile.onnx",
+      "sha256": "5582933662898cd2b4c2eae8a7e5e4fbdff84773711f29db00a1cbd185059001"
+    },
+    "arabic_PP-OCRv4_rec_mobile": {
+      "file": "arabic_PP-OCRv4_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/arabic_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "4a9011bef71687bb84288dc86ad2471bd5d37b717ddf672dd156f9e7a5601bac"
+    },
+    "ch_PP-OCRv4_rec_mobile": {
+      "file": "ch_PP-OCRv4_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/ch_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b"
+    },
+    "chinese_cht_PP-OCRv3_rec_mobile": {
+      "file": "chinese_cht_PP-OCRv3_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/chinese_cht_PP-OCRv3_rec_mobile.onnx",
+      "sha256": "779656d044ce388045e02ea9244724616194e63928606436cdfc6dc3c9528cc6"
+    },
+    "cyrillic_PP-OCRv3_rec_mobile": {
+      "file": "cyrillic_PP-OCRv3_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/cyrillic_PP-OCRv3_rec_mobile.onnx",
+      "sha256": "1efb65bdc460af1c0e8733d005b20952b17ca5aac10ddb56c968333791c5eaa3"
+    },
+    "devanagari_PP-OCRv4_rec_mobile": {
+      "file": "devanagari_PP-OCRv4_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/devanagari_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "a62b6148303187907aa0b0d3a0125bdc62557d07966468cab9056949e36035e8"
+    },
+    "en_PP-OCRv4_rec_mobile": {
+      "file": "en_PP-OCRv4_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/en_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "e8770c967605983d1570cdf5352041dfb68fa0c21664f49f47b155abd3e0e318"
+    },
+    "japan_PP-OCRv4_rec_mobile": {
+      "file": "japan_PP-OCRv4_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/japan_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "e1075a67dba758ecfc7ebc78a10ae61c95ac8fb66a9c86fab5541e33f085cb7a"
+    },
+    "ka_PP-OCRv4_rec_mobile": {
+      "file": "ka_PP-OCRv4_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/ka_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "9c1e186ea1d13cf6c853e57b42d382c3961fdd6acc2409e0d0dc44defc9f152b"
+    },
+    "korean_PP-OCRv4_rec_mobile": {
+      "file": "korean_PP-OCRv4_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/korean_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "ab151ba9065eccd98f884cf4d927db091be86137276392072edd4f9d43ad7426"
+    },
+    "latin_PP-OCRv3_rec_mobile": {
+      "file": "latin_PP-OCRv3_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/latin_PP-OCRv3_rec_mobile.onnx",
+      "sha256": "e9d7a33667e8aaa702862975186adf2012e3f390cc0f9422865957125f8071cf"
+    },
+    "ta_PP-OCRv4_rec_mobile": {
+      "file": "ta_PP-OCRv4_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/ta_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "f78d752148873c5fa6e4294002bfd162dbba54236e406a39665ebbda766161b5"
+    },
+    "te_PP-OCRv4_rec_mobile": {
+      "file": "te_PP-OCRv4_rec_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/rec/te_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "e608c3be00c8a9ea2f5c667d90f379403e2568bd5c8183308a49ca093def8eff"
+    },
+    "ch_ppocr_mobile_v2.0_cls_mobile": {
+      "file": "ch_ppocr_mobile_v2.0_cls_mobile.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/cls/ch_ppocr_mobile_v2.0_cls_mobile.onnx",
+      "sha256": "e47acedf663230f8863ff1ab0e64dd2d82b838fceb5957146dab185a89d6215c"
+    }
+  },
+  "languages": [
+    {
+      "id": "ch",
+      "name": "中英混合",
+      "det": "ch_PP-OCRv4_det_mobile",
+      "rec": "ch_PP-OCRv4_rec_mobile"
+    },
+    {
+      "id": "en",
+      "name": "英文",
+      "det": "en_PP-OCRv3_det_mobile",
+      "rec": "en_PP-OCRv4_rec_mobile"
+    },
+    {
+      "id": "japan",
+      "name": "日文",
+      "det": "multi_PP-OCRv3_det_mobile",
+      "rec": "japan_PP-OCRv4_rec_mobile"
+    },
+    {
+      "id": "korean",
+      "name": "韩文",
+      "det": "multi_PP-OCRv3_det_mobile",
+      "rec": "korean_PP-OCRv4_rec_mobile"
+    },
+    {
+      "id": "chinese_cht",
+      "name": "繁体中文",
+      "det": "ch_PP-OCRv4_det_mobile",
+      "rec": "chinese_cht_PP-OCRv3_rec_mobile"
+    },
+    {
+      "id": "latin",
+      "name": "拉丁语系（法、德、西等）",
+      "det": "multi_PP-OCRv3_det_mobile",
+      "rec": "latin_PP-OCRv3_rec_mobile"
+    },
+    {
+      "id": "arabic",
+      "name": "阿拉伯语系",
+      "det": "multi_PP-OCRv3_det_mobile",
+      "rec": "arabic_PP-OCRv4_rec_mobile"
+    },
+    {
+      "id": "cyrillic",
+      "name": "西里尔语系（俄等）",
+      "det": "multi_PP-OCRv3_det_mobile",
+      "rec": "cyrillic_PP-OCRv3_rec_mobile"
+    },
+    {
+      "id": "devanagari",
+      "name": "天城文语系（印地等）",
+      "det": "multi_PP-OCRv3_det_mobile",
+      "rec": "devanagari_PP-OCRv4_rec_mobile"
+    },
+    {
+      "id": "ta",
+      "name": "泰米尔文",
+      "det": "multi_PP-OCRv3_det_mobile",
+      "rec": "ta_PP-OCRv4_rec_mobile"
+    },
+    {
+      "id": "te",
+      "name": "泰卢固文",
+      "det": "multi_PP-OCRv3_det_mobile",
+      "rec": "te_PP-OCRv4_rec_mobile"
+    },
+    {
+      "id": "ka",
+      "name": "卡纳达文",
+      "det": "multi_PP-OCRv3_det_mobile",
+      "rec": "ka_PP-OCRv4_rec_mobile"
+    }
+  ],
+  "classifier": "ch_ppocr_mobile_v2.0_cls_mobile"
+}

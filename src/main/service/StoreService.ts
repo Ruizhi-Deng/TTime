@@ -108,6 +108,8 @@ class StoreService {
   }
 
   static initConfig = (): void => {
+    if (!StoreService.configHas('localOcrLanguage')) StoreService.configSet('localOcrLanguage', 'ch')
+    if (!StoreService.configHas('localOcrMergeParagraphs')) StoreService.configSet('localOcrMergeParagraphs', true)
     if (!StoreService.configHas('aiPrompts')) {
       StoreService.configSet('aiPrompts', defaultAiPrompts)
     }

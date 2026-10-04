@@ -13,7 +13,10 @@ import OcrTypeEnum from '../enums/OcrTypeEnum'
 import { YesNoEnum } from '../../common/enums/YesNoEnum'
 import StoreService from './StoreService'
 import { SystemTypeEnum } from '../enums/SystemTypeEnum'
+import { localOcrModels } from './LocalOcrModels'
+import { OcrResult } from '../../common/ocr/OcrResult'
 
+let localOcrRequestId = 0
 let nullWin: BrowserWindow
 
 const screenshotWinMap = new Map()
@@ -35,11 +38,22 @@ ipcMain.handle('handle-image-text-recognition-event', async (_event, imgByBase64
   if (isNull(ocrService)) {
     return
   }
+  const requestId = ++localOcrRequestId
   // 获取Ocr服务类型
   const type = ocrService.type
   if (OcrServiceEnum.TTIME === type) {
     // TTime类型则调用本地Ocr
-    ScreenshotsMain.textOcrWin.webContents.send('local-ocr', imgByBase64)
+    const language = StoreService.configGet('localOcrLanguage') as string
+    try {
+      const models = await localOcrModels.prepare(language)
+      if (requestId !== localOcrRequestId) return
+      ScreenshotsMain.textOcrWin.webContents.send('local-ocr', {
+        requestId, image: imgByBase64, language, models,
+        merge: StoreService.configGet('localOcrMergeParagraphs')
+      })
+    } catch (error: any) {
+      if (requestId === localOcrRequestId) await GlobalWin.ocrUpdateContent(YesNoEnum.N, error.message)
+    }
   } else {
     const info = {
       appId: ocrService.appId,
@@ -84,8 +98,15 @@ ipcMain.handle('screenshot-end-event', (_event, imgByBase64) => {
 /**
  * 文本识别事件
  */
-ipcMain.handle('text-ocr-event', async (_event, text) => {
-  await GlobalWin.ocrUpdateContent(YesNoEnum.Y, text)
+ipcMain.handle('local-ocr-result', async (_event, requestId: number, result: OcrResult) => {
+  if (requestId !== localOcrRequestId) return
+  if (ScreenshotsMain.ocrType === OcrTypeEnum.OCR)
+    GlobalWin.ocrWin.webContents.send('update-ocr-result', result)
+  await GlobalWin.ocrUpdateContent(YesNoEnum.Y, result.allText)
+})
+
+ipcMain.handle('local-ocr-error', async (_event, requestId: number, message: string) => {
+  if (requestId === localOcrRequestId) await GlobalWin.ocrUpdateContent(YesNoEnum.N, message)
 })
 
 /**

@@ -9,6 +9,7 @@ declare global {
     ocrAlwaysOnTopEvent
     updateImg
     updateText
+    updateOcrResult
     winSizeUpdate
     base64ImgWriteShearPlateEvent
     updateTranslatedContentEvent

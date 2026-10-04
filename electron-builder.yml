@@ -12,7 +12,7 @@ files:
   - '!README.en.assets/*'
 asarUnpack:
   - '**/*.{node,dll}'
-  - '**/ocr/*.{onnx,txt}'
+  - '**/ocr/models/**'
   - '**/plugins/*.exe'
 #asar:
 #  false

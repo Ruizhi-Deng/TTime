@@ -56,3 +56,6 @@ hs_err_pid*
 /.mvn/
 node_modules/
 /.history/
+
+# Downloaded, pinned OCR models
+/ocr/models/

@@ -68,7 +68,6 @@ function localFetch(url, options) {
 async function main() {
   const prompts = loadSource('src/common/utils/aiPrompts.ts')
   const parser = loadSource('src/common/utils/aiRequest.ts')
-  const deeplx = loadSource('src/common/utils/deepLXRequest.ts')
   const textWithVariables = 'line 1\n{{target}} 🐱'
   const messages = clone(
     prompts.buildPromptMessages(prompts.defaultAiPrompts[0], textWithVariables, 'English', '中文')
@@ -101,13 +100,6 @@ async function main() {
   )
   assert.equal(
     await collect(
-      'Ollama',
-      '{"message":{"content":"猫"},"done":false}\n{"message":{"content":"🐱"},"done":true}'
-    ),
-    '猫🐱'
-  )
-  assert.equal(
-    await collect(
       'Gemini',
       'data: {"candidates":[{"content":{"parts":[{"text":"hidden","thought":true},{"text":"visible"}]},"finishReason":"STOP"}]}\n\n'
     ),
@@ -119,8 +111,6 @@ async function main() {
   )
   await assert.rejects(collect('OpenAI', 'data: {"error":{"message":"bad key"}}\n\n'), /bad key/)
   await assert.rejects(collect('OpenAI', 'data: [DONE]\n\n'), /文本结果/)
-  assert.equal(deeplx.readDeepLXResponse({ code: 200, data: '翻译' }), '翻译')
-  assert.throws(() => deeplx.readDeepLXResponse({ code: 429, message: 'rate limit' }), /rate limit/)
 
   const calls = []
   let slowSeen
@@ -137,11 +127,6 @@ async function main() {
       res.end('bad key')
       return
     }
-    if (req.url === '/translate') {
-      res.end(JSON.stringify({ code: 200, data: 'DeepLX result' }))
-      return
-    }
-    const ollama = req.url === '/api/chat'
     const gemini = req.url.startsWith('/gemini/models/')
     const stream = gemini ? req.url.includes('streamGenerateContent') : body.stream
     const content = `result:${body.model || 'native'}`
@@ -149,17 +134,14 @@ async function main() {
       if (!stream) {
         res.end(
           JSON.stringify(
-            ollama
-              ? { message: { content } }
-              : gemini
+            gemini
               ? { candidates: [{ content: { parts: [{ text: content }] } }] }
               : { choices: [{ message: { content } }] }
           )
         )
         return
       }
-      if (ollama) res.end(JSON.stringify({ message: { content }, done: true }) + '\n')
-      else if (gemini)
+      if (gemini)
         res.end(
           'data: ' +
             JSON.stringify({
@@ -172,7 +154,7 @@ async function main() {
           'data: ' + JSON.stringify({ choices: [{ delta: { content } }] }) + '\n\ndata: [DONE]\n\n'
         )
     }
-    res.setHeader('Content-Type', stream && !ollama ? 'text/event-stream' : 'application/json')
+    res.setHeader('Content-Type', stream ? 'text/event-stream' : 'application/json')
     if (body.model === 'slow') {
       slowSeen()
       setTimeout(() => {
@@ -206,7 +188,7 @@ async function main() {
   })
   try {
     await Promise.all(
-      ['OpenAI', 'DeepSeek', 'Zhipu', 'AzureOpenAI'].map((type) =>
+      ['OpenAI', 'DeepSeek', 'Zhipu'].map((type) =>
         transport.requestAiTranslation(info(type, type))
       )
     )
@@ -214,7 +196,7 @@ async function main() {
       transport.requestAiTranslation(info('OpenAI', 'a', 'model-a')),
       transport.requestAiTranslation(info('OpenAI', 'b', 'model-b'))
     ])
-    for (const id of ['OpenAI', 'DeepSeek', 'Zhipu', 'AzureOpenAI', 'a', 'b']) {
+    for (const id of ['OpenAI', 'DeepSeek', 'Zhipu', 'a', 'b']) {
       const own = events.filter((event) => event.data.request.id === id)
       assert.deepEqual(
         own.map((event) => event.data.response.code),
@@ -233,10 +215,6 @@ async function main() {
       'result:model-b'
     )
     assert.equal(
-      calls.find((call) => call.headers['api-key']).headers['api-key'],
-      'AzureOpenAI-key'
-    )
-    assert.equal(
       calls.find((call) => call.body.model === 'model-a').headers.authorization,
       'Bearer a-key'
     )
@@ -246,12 +224,6 @@ async function main() {
         .every((call) => call.url === '/chat?custom=yes')
     )
 
-    await transport.requestAiTranslation({
-      ...info('Ollama', 'local'),
-      appKey: '',
-      requestUrl: base + '/api/chat'
-    })
-    assert.equal(calls.find((call) => call.url === '/api/chat').headers.authorization, undefined)
     await transport.requestAiTranslation({
       ...info('Gemini', 'gemini'),
       requestUrl: base + '/gemini'
@@ -263,30 +235,9 @@ async function main() {
     assert.ok(calls.find((call) => call.url.startsWith('/gemini')).body.systemInstruction)
     await transport.requestAiTranslation(info('OpenAI', 'non-stream', 'custom', false))
     await transport.requestAiTranslation({
-      ...info('Ollama', 'local-json', 'local-model', false),
-      appKey: '',
-      requestUrl: base + '/api/chat'
-    })
-    await transport.requestAiTranslation({
       ...info('Gemini', 'gemini-json', 'gemini-model', false),
       requestUrl: base + '/gemini'
     })
-    const lx = loadSource('src/renderer/src/channel/DeepLXChannelRequest.ts', {
-      window: { api },
-      fetch: localFetch
-    })
-    await lx.requestDeepLXTranslation({
-      ...info('DeepLX', 'lx'),
-      appKey: '',
-      requestUrl: base + '/translate'
-    })
-    const lxCall = calls.find((call) => call.url === '/translate')
-    assert.equal(lxCall.body.text, 'input')
-    assert.equal(lxCall.headers.authorization, undefined)
-    assert.equal(
-      events.find((event) => event.data.request.id === 'lx').data.response.content,
-      'DeepLX result'
-    )
     await transport.requestAiTranslation({ ...info('OpenAI', 'check'), isTranslateCheckType: true })
     assert.equal(events.filter((event) => event.data.request.id === 'check').length, 1)
     assert.equal(

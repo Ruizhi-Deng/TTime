@@ -22,7 +22,7 @@ This branch uses the last public source tree as the maintainable base and recons
    - OpenAI-compatible endpoint/model
    - multiple OpenAI instances
    - local custom system/user prompts
-   - Ollama/Gemini/DeepLX/Zhipu only where useful
+   - DeepSeek, Gemini, and Zhipu
 4. Recover the modern OCR pipeline:
    - PP-OCRv4 / multilingual model selection
    - Chinese+English mixed recognition

@@ -3,9 +3,7 @@ import { AiPrompt, buildPromptMessages } from './aiPrompts'
 
 export const aiServiceTypes = [
   TranslateServiceEnum.OPEN_AI,
-  TranslateServiceEnum.AZURE_OPEN_AI,
   TranslateServiceEnum.DEEP_SEEK,
-  TranslateServiceEnum.OLLAMA,
   TranslateServiceEnum.GEMINI,
   TranslateServiceEnum.ZHIPU
 ]
@@ -43,14 +41,12 @@ export const buildAiRequest = (info: AiRequestInfo, stream: boolean) => {
       }
     }
   }
-  if (info.appKey)
-    headers[info.type === TranslateServiceEnum.AZURE_OPEN_AI ? 'api-key' : 'Authorization'] =
-      info.type === TranslateServiceEnum.AZURE_OPEN_AI ? info.appKey : `Bearer ${info.appKey}`
+  if (info.appKey) headers.Authorization = `Bearer ${info.appKey}`
   return {
     url: info.requestUrl,
     headers,
     body: {
-      ...(info.type === TranslateServiceEnum.AZURE_OPEN_AI ? {} : { model: info.model }),
+      model: info.model,
       messages,
       stream
     }
@@ -60,8 +56,7 @@ export const buildAiRequest = (info: AiRequestInfo, stream: boolean) => {
 export const readAiResponse = (type: string, data): string => {
   if (data.error) throw new Error(typeof data.error === 'string' ? data.error : data.error.message)
   let text: string
-  if (type === TranslateServiceEnum.OLLAMA) text = data.message.content
-  else if (type === TranslateServiceEnum.GEMINI) {
+  if (type === TranslateServiceEnum.GEMINI) {
     text = data.candidates?.[0]?.content?.parts
       ?.filter((part) => !part.thought)
       .map((part) => part.text || '')
@@ -73,8 +68,6 @@ export const readAiResponse = (type: string, data): string => {
 
 const readChunk = (type: string, data): { text: string; done: boolean } => {
   if (data.error) throw new Error(typeof data.error === 'string' ? data.error : data.error.message)
-  if (type === TranslateServiceEnum.OLLAMA)
-    return { text: data.message?.content || '', done: data.done === true }
   if (type === TranslateServiceEnum.GEMINI) {
     const candidate = data.candidates?.[0]
     return {
@@ -99,9 +92,7 @@ export async function* readAiStream(
   let eventData: string[] = []
   let completed = false
   let receivedText = false
-  const ndjson = type === TranslateServiceEnum.OLLAMA
   const consumeLine = (line: string): { text: string; done: boolean } | undefined => {
-    if (ndjson) return line.trim() ? readChunk(type, JSON.parse(line)) : undefined
     if (line.startsWith('data:')) eventData.push(line.slice(5).trimStart())
     if (line !== '' || eventData.length === 0) return
     const payload = eventData.join('\n')
@@ -128,8 +119,8 @@ export async function* readAiStream(
   }
   if (!completed) {
     buffer += decoder.decode()
-    const final = consumeLine(buffer.replace(/\r$/, ''))
-    const event = ndjson ? final : consumeLine('')
+    consumeLine(buffer.replace(/\r$/, ''))
+    const event = consumeLine('')
     if (event?.text) {
       receivedText = true
       yield event.text

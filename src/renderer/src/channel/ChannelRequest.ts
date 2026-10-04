@@ -1,4 +1,3 @@
-import { requestDeepLXTranslation } from './DeepLXChannelRequest'
 import { requestAiTranslation } from './AiChannelRequest'
 import { BingChannelRequest } from './BingChannelRequest'
 import { GoogleChannelRequest } from './GoogleChannelRequest'
@@ -43,12 +42,9 @@ class ChannelRequest {
   }
 
   static openaiTranslate = requestAiTranslation
-  static azureopenaiTranslate = requestAiTranslation
   static deepseekTranslate = requestAiTranslation
-  static ollamaTranslate = requestAiTranslation
   static geminiTranslate = requestAiTranslation
   static zhipuTranslate = requestAiTranslation
-  static deeplxTranslate = requestDeepLXTranslation
 
   /**
    * bing - 翻译

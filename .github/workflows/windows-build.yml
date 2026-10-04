@@ -40,6 +40,12 @@ jobs:
       - name: Verify AI requests and streams
         run: npm run test:ai
 
+      - name: Prepare pinned OCR models
+        run: npm run prepare:ocr
+
+      - name: Verify local OCR
+        run: npm run test:ocr
+
       - name: Build Electron app
         run: npm run build
 
@@ -48,6 +54,9 @@ jobs:
 
       - name: Package portable build
         run: npx electron-builder --win portable --config --publish never
+
+      - name: Verify packaged OCR resources
+        run: node scripts/check-packaged-ocr.cjs
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4

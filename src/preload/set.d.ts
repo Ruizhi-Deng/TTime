@@ -6,6 +6,8 @@ declare global {
     updateTranslateShortcutKeyEvent
     getSystemTypeEvent
     closeSetWinEvent
+    localOcrModelStatus
+    prepareLocalOcrModels
     autoLaunchEvent
     updateTranslateServiceNotify
     apiUniteTranslateCheck

@@ -81,12 +81,12 @@
             />
           </el-form-item>
 
-          <el-form-item v-if="isAiService(translateServiceThis.type) || translateServiceThis.type === TranslateServiceEnum.DEEP_LX" label="接口地址">
-            <el-input v-model="translateServiceThis.requestUrl" spellcheck="false" :placeholder="translateServiceThis.type === TranslateServiceEnum.AZURE_OPEN_AI ? '完整 Azure 部署 URL（含 api-version）' : ''" />
+          <el-form-item v-if="isAiService(translateServiceThis.type)" label="接口地址">
+            <el-input v-model="translateServiceThis.requestUrl" spellcheck="false" />
             <span class="form-switch-span" v-if="translateServiceThis.type === TranslateServiceEnum.GEMINI">Gemini API 基础地址，如 https://generativelanguage.googleapis.com/v1beta</span>
             <span class="form-switch-span" v-else>填写完整请求地址，路径和查询参数会原样使用。</span>
           </el-form-item>
-          <el-form-item v-if="isAiService(translateServiceThis.type) && translateServiceThis.type !== TranslateServiceEnum.AZURE_OPEN_AI" label="模型">
+          <el-form-item v-if="isAiService(translateServiceThis.type)" label="模型">
             <el-input v-model="translateServiceThis.model" placeholder="填写服务提供方的模型 ID" spellcheck="false" />
           </el-form-item>
           <el-form-item v-if="isAiService(translateServiceThis.type)" label="提示词">
@@ -302,10 +302,10 @@ const translateServiceCheckAndSave = (): void => {
   if (config.keyRequired !== false && ((isNull(value.appId) && !config.isOneAppKey) || isNull(value.appKey))) {
     return ElMessageExtend.warning('请输入密钥信息后再进行验证')
   }
-  if (isAiService(value.type) || value.type === TranslateServiceEnum.DEEP_LX) {
+  if (isAiService(value.type)) {
     if (!/^https?:\/\/\S+$/.test(value.requestUrl)) return ElMessageExtend.warning('请输入完整的 HTTP 或 HTTPS 请求地址')
     if (isAiService(value.type)) {
-      if (value.type !== TranslateServiceEnum.AZURE_OPEN_AI && !value.model.trim()) return ElMessageExtend.warning('请填写模型 ID')
+      if (!value.model.trim()) return ElMessageExtend.warning('请填写模型 ID')
       if (!value.aiPromptId) return ElMessageExtend.warning('请选择提示词')
     }
   }
