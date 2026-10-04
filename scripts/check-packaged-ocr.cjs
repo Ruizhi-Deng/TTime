@@ -5,7 +5,7 @@ const { createHash } = require('node:crypto')
 const asar = require('asar')
 const registry = require('../src/common/ocr/models.json')
 
-const resources = path.resolve('dist/win-unpacked/resources')
+const resources = path.resolve(process.argv[2] || 'dist/win-unpacked/resources')
 const archive = path.join(resources, 'app.asar')
 const ids = new Set([registry.classifier, 'en_PP-OCRv4_rec_mobile'])
 for (const language of registry.languages.filter((item) => ['ch', 'en'].includes(item.id))) {
@@ -15,7 +15,7 @@ for (const language of registry.languages.filter((item) => ['ch', 'en'].includes
 for (const id of ids) {
   const model = registry.models[id]
   const relative = `ocr/models/${model.sha256}/${model.file}`
-  assert.equal(asar.getFileInfo(archive, relative).unpacked, true)
+  assert.equal(asar.statFile(archive, relative).unpacked, true)
   const bytes = fs.readFileSync(path.join(resources, 'app.asar.unpacked', relative))
   assert.equal(createHash('sha256').update(bytes).digest('hex'), model.sha256)
 }
