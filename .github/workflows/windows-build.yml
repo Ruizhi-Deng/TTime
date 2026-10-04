@@ -10,7 +10,6 @@ on:
   push:
     branches:
       - main
-      - reverse-0915
     paths-ignore:
       - "docs/**"
       - "**/*.md"

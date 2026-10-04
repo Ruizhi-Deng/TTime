@@ -31,7 +31,7 @@ npx electron-builder --win nsis portable --config --publish never
 
 GitHub Actions 生成 `TTime-windows-community`，包括安装程序与便携程序。`test:local` 验证历史保存、异步结果更新、超过 30 条历史以及删除后的计数。编译和打包不代替 Windows 上的快捷键、截图与本地 OCR 实测。
 
-Actions 在 Windows runner 上缓存完整依赖目录，以及 Electron、打包工具和中英 OCR 模型。安装版与便携版用同一次 electron-builder 调用生成，共用应用准备与压缩包；取消无自动更新用途的差分包。验证由 `npm run verify` 执行。普通构建自动取消同分支的过时运行，发布构建单独分组；所有 Release 均从 `main` 的提交构建并在同一 runner 上传资源，其他分支禁止发布。普通推送构建覆盖 `main` 与 `reverse-0915`；发布同一版本时替换现有文件与校验值，并将标签指向本次 `main` 构建提交。
+Actions 在 Windows runner 上缓存完整依赖目录，以及 Electron、打包工具和中英 OCR 模型。安装版与便携版用同一次 electron-builder 调用生成，共用应用准备与压缩包；取消无自动更新用途的差分包。验证由 `npm run verify` 执行。普通构建自动取消同分支的过时运行，发布构建单独分组；所有 Release 均从 `main` 的提交构建并在同一 runner 上传资源，其他分支禁止发布。普通推送构建覆盖 `main`；发布同一版本时替换现有文件与校验值，并将标签指向本次 `main` 构建提交。
 
 ## 第三阶段已完成
 
