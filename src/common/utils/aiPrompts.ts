@@ -49,7 +49,7 @@ export const buildPromptMessages = (
 ) => {
   const values = { text, source, target }
   const render = (template: string): string =>
-    template.replace(/\{\{(text|source|target)\}\}/g, (_, key) => values[key])
+    template.replace(/\{\{\s*(text|source|target)\s*\}\}/g, (_, key) => values[key])
   const messages: Array<{ role: string; content: string }> = []
   if (prompt.systemPrompt.trim())
     messages.push({ role: 'system', content: render(prompt.systemPrompt) })

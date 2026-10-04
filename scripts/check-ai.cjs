@@ -73,6 +73,25 @@ async function main() {
     prompts.buildPromptMessages(prompts.defaultAiPrompts[0], textWithVariables, 'English', '中文')
   )
   assert.ok(messages[1].content.endsWith(textWithVariables))
+  assert.deepEqual(
+    clone(
+      prompts.buildPromptMessages(
+        {
+          id: 'spaced',
+          name: '空格变量',
+          systemPrompt: '{{ source }} → {{target }}',
+          userPrompt: '{{ text }} / {{text}}'
+        },
+        textWithVariables,
+        'English',
+        '中文'
+      )
+    ),
+    [
+      { role: 'system', content: 'English → 中文' },
+      { role: 'user', content: `${textWithVariables} / ${textWithVariables}` }
+    ]
+  )
   assert.throws(() => prompts.findAiPrompt(prompts.defaultAiPrompts, 'missing'), /提示词/)
 
   async function collect(type, text) {

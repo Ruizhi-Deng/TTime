@@ -33,9 +33,11 @@
         />
       </el-form-item>
     </el-form>
-    <p v-pre>
-      可用变量：{{ text }} 原文、{{ source }} 原文语言、{{ target }} 目标语言。用户提示词需要包含
-      {{ text }}。
+    <p>
+      可用变量：<code v-text="'{{text}}'" /> 原文、<code v-text="'{{source}}'" /> 原文语言、<code
+        v-text="'{{target}}'"
+      />
+      目标语言。用户提示词需要包含 <code v-text="'{{text}}'" />，括号内可有空格。
     </p>
     <p>提示词保存在本机。每个 AI 实例可独立选择提示词；新增实例默认使用「翻译」。</p>
     <el-button type="primary" @click="savePrompt">保存提示词</el-button>
@@ -67,7 +69,7 @@ const addPrompt = (): void => {
 
 const savePrompt = (): void => {
   if (!editing.value.name.trim()) return ElMessageExtend.warning('请填写提示词名称')
-  if (!editing.value.userPrompt.includes('{{text}}'))
+  if (!/\{\{\s*text\s*\}\}/.test(editing.value.userPrompt))
     return ElMessageExtend.warning('用户提示词需要包含 {{text}}')
   const index = prompts.value.findIndex((prompt) => prompt.id === editing.value.id)
   prompts.value[index] = { ...editing.value }
