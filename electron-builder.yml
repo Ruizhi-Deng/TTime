@@ -20,6 +20,7 @@ afterSign: build/notarize.js
 win:
   executableName: TTime Community
 nsis:
+  differentialPackage: false
   artifactName: ${productName}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}

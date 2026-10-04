@@ -21,6 +21,7 @@
     "build:linux": "npm run modules-update && npm run build && electron-builder --linux --config",
     "npm-i-extend-modules-update": "npm i && npm run modules-update",
     "modules-update": "node modules-update.ts",
+    "verify": "npm run test:local && npm run test:ai && npm run test:ocr",
     "test:local": "node scripts/check-local-data.cjs",
     "test:ai": "node scripts/check-ai.cjs",
     "prepare:ocr": "node scripts/prepare-ocr.cjs",

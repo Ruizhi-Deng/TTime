@@ -14,10 +14,16 @@ on:
       - "docs/**"
       - "**/*.md"
 
+concurrency:
+  group: windows-${{ github.ref }}-${{ inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community ') }}
+  cancel-in-progress: ${{ !(inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community ')) }}
+
 jobs:
   build-windows:
     runs-on: windows-2022
-    timeout-minutes: 45
+    timeout-minutes: 30
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -33,32 +39,37 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Restore installed dependencies
+        id: dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: windows-2022-node16-dependencies-v1-${{ hashFiles('package-lock.json', 'node_modules_update/**', 'modules-update.ts') }}
+
+      - name: Restore Electron, packaging tools and OCR models
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\AppData\Local\electron\Cache
+            ~\AppData\Local\electron-builder\Cache
+            ocr/models
+          key: windows-build-assets-v1-${{ hashFiles('src/common/ocr/models.json') }}
+
       - name: Install dependencies
+        if: steps.dependencies.outputs.cache-hit != 'true'
         run: npm ci --legacy-peer-deps
 
       - name: Apply patched node modules
         run: npm run modules-update
 
-      - name: Verify local history
-        run: npm run test:local
-
-      - name: Verify AI requests and streams
-        run: npm run test:ai
-
-      - name: Prepare pinned OCR models
-        run: npm run prepare:ocr
-
-      - name: Verify local OCR
-        run: npm run test:ocr
-
-      - name: Build Electron app
+      - name: Build Electron app and prepare OCR models
         run: npm run build
 
-      - name: Package NSIS installer
-        run: npx electron-builder --win nsis --config --publish never
+      - name: Verify history, AI and local OCR
+        run: npm run verify
 
-      - name: Package portable build
-        run: npx electron-builder --win portable --config --publish never
+      - name: Package installer and portable build together
+        run: npx electron-builder --win nsis portable --config --publish never
 
       - name: Verify packaged OCR resources
         run: node scripts/check-packaged-ocr.cjs
@@ -69,26 +80,11 @@ jobs:
           name: TTime-windows-community
           path: |
             dist/*.exe
-            dist/*.yml
           if-no-files-found: error
-
-  publish-release:
-    needs: build-windows
-    if: inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community ')
-    runs-on: windows-2022
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout release source
-        uses: actions/checkout@v4
-
-      - name: Download verified Windows packages
-        uses: actions/download-artifact@v4
-        with:
-          name: TTime-windows-community
-          path: dist
+          compression-level: 0
 
       - name: Publish release
+        if: inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community ')
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}

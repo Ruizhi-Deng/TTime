@@ -26,11 +26,12 @@ npm run test:ai
 npm run prepare:ocr
 npm run test:ocr
 npm run build
-npx electron-builder --win nsis --config --publish never
-npx electron-builder --win portable --config --publish never
+npx electron-builder --win nsis portable --config --publish never
 ```
 
 GitHub Actions 生成 `TTime-windows-community`，包括安装程序与便携程序。`test:local` 验证历史保存、异步结果更新、超过 30 条历史以及删除后的计数。编译和打包不代替 Windows 上的快捷键、截图与本地 OCR 实测。
+
+Actions 在 Windows runner 上缓存完整依赖目录，以及 Electron、打包工具和中英 OCR 模型。安装版与便携版用同一次 electron-builder 调用生成，共用应用准备与压缩包；取消无自动更新用途的差分包。验证由 `npm run verify` 执行。普通构建自动取消同分支的过时运行，发布构建单独分组；发布直接在构建 runner 上传资源。
 
 ## 第三阶段已完成
 
