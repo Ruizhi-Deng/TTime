@@ -94,11 +94,43 @@ assert.equal(e.win.messages.at(-1).data.manualHeight, true)
 
 // Windows fractional DPI rounding must not grow the width on each content update.
 const f = setup()
-f.win.setSize = function(width, height) {
-  this.setBounds({ ...this.bounds, width: width + 1, height })
+f.win.setBounds = function(bounds) {
+  this.bounds = { ...bounds, width: bounds.width + 1 }
+  this.emit('resize')
 }
 f.sizing.autoHeight(500)
 f.sizing.autoHeight(600)
 assert.deepEqual(f.win.getSize(), [600, 600])
+
+// Reproduce native bounds drift even when setBounds gets explicit x/y.
+// Twenty typing/stream updates must leave the original top-left corner fixed.
+for (const origin of [{ x: 600, y: 200 }, { x: -800, y: 50 }]) {
+  const g = setup()
+  g.win.bounds = { ...g.win.bounds, ...origin }
+  let nativeUpdates = 0
+  g.win.setBounds = function(bounds) {
+    nativeUpdates++
+    this.bounds = {
+      ...bounds, x: bounds.x - 8, y: bounds.y - 8,
+      width: bounds.width + 1, height: bounds.height + 1
+    }
+    this.emit('resize')
+  }
+  for (let i = 0; i < 20; i++) {
+    const height = i % 2 ? 500 : 722
+    g.sizing.autoHeight(height)
+    assert.deepEqual(g.win.getBounds(), { ...origin, width: 600, height })
+  }
+  const beforeRepeatedTyping = nativeUpdates
+  for (let i = 0; i < 100; i++) g.sizing.autoHeight(500)
+  assert.equal(nativeUpdates, beforeRepeatedTyping)
+  assert.ok(nativeUpdates <= 40)
+  // A deliberate user move becomes the new anchor for later content updates.
+  g.win.bounds = { ...g.win.bounds, x: origin.x + 100, y: origin.y + 50 }
+  g.sizing.autoHeight(600)
+  assert.deepEqual(g.win.getBounds(), {
+    x: origin.x + 100, y: origin.y + 50, width: 600, height: 600
+  })
+}
 
 console.log('Window resize checks passed')
