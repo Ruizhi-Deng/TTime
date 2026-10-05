@@ -304,7 +304,10 @@ const api = {
   agentApiOcr,
   agentApiOcrCallback,
   winFontSizeNotify,
-  winSizeUpdate
+  winSizeUpdate,
+  startWindowResize: (): void => ipcRenderer.send('main-window-resize-start'),
+  moveWindowResize: (): void => ipcRenderer.send('main-window-resize-move'),
+  endWindowResize: (): void => ipcRenderer.send('main-window-resize-end')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

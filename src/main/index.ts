@@ -57,7 +57,7 @@ function createWindow(): void {
     width: mainWinInfo.width,
     height: mainWinInfo.height,
     minWidth: 450,
-    minHeight: 339,
+    minHeight: 150,
     // 跳过任务栏显示
     skipTaskbar: true,
     // 关闭阴影效果 否则设置了窗口透明清空下 透明处会显示阴影效果
@@ -155,22 +155,6 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow()
     }
-  })
-
-  /**
-   * 调整窗口大小时触发
-   *
-   * @param newBounds 新位置的坐标、宽高信息
-   */
-  mainWin.on('will-resize', (event, newBounds) => {
-    // 禁止手动调整的事件 否则高度也会被改变
-    event.preventDefault()
-    // 下面自己实现调整的方法
-    const width = newBounds.width
-    StoreService.configSet('mainWinWidth', width)
-    // 更新窗口大小
-    WinEvent.updateWinSize(GlobalWin.mainWin, width, GlobalWin.mainWin.getSize()[1])
-    GlobalWin.mainWin.webContents.send('win-size-update', newBounds)
   })
 })
 

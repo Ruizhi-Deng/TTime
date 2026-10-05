@@ -26,6 +26,9 @@ declare global {
     updateCacheEvent
     winFontSizeNotify
     winSizeUpdate
+    startWindowResize: () => void
+    moveWindowResize: () => void
+    endWindowResize: () => void
   }
 
   interface Window {

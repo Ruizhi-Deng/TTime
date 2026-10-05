@@ -1,5 +1,5 @@
 <template>
-  <div class='block'>
+  <div class='block' :class='{ "manual-height": manualHeight }'>
     <Header />
     <div class='block-layer'>
       <Input
@@ -16,6 +16,15 @@
 
       <input-result-content ref='translatedResultInput' />
     </div>
+    <div
+      class='resize-grip'
+      title='拖拽调整窗口大小'
+      @pointerdown='startResize'
+      @pointermove='moveResize'
+      @pointerup='endResize'
+      @pointercancel='endResize'
+      @lostpointercapture='endResize'
+    />
   </div>
 </template>
 
@@ -25,7 +34,7 @@ import Input from './components/Input.vue'
 import LanguageSelect from './components/LanguageSelect.vue'
 import InputResultContent from './components/InputResultContent.vue'
 
-import { nextTick, ref } from 'vue'
+import { nextTick, onUnmounted, ref } from 'vue'
 import ElMessageExtend from '../utils/messageExtend'
 
 import { isNull } from '../../../common/utils/validate'
@@ -45,6 +54,33 @@ const translateInput = ref('')
 const translatedResultInput = ref('')
 const hideTranslateInput = ref(false)
 const hideTranslateLanguage = ref(false)
+const manualHeight = ref(false)
+let resizePointer: number | undefined
+
+window.api.winSizeUpdate((bounds) => {
+  manualHeight.value = bounds.manualHeight === true
+})
+
+const startResize = (event: PointerEvent): void => {
+  if (event.button !== 0 || resizePointer !== undefined) return
+  event.preventDefault()
+  resizePointer = event.pointerId
+  ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+  window.api.startWindowResize()
+}
+
+const moveResize = (event: PointerEvent): void => {
+  if (event.pointerId === resizePointer) window.api.moveWindowResize()
+}
+
+const endResize = (event: PointerEvent): void => {
+  if (event.pointerId !== resizePointer) return
+  if (event.type === 'pointerup') window.api.moveWindowResize()
+  window.api.endWindowResize()
+  resizePointer = undefined
+}
+
+onUnmounted(() => window.api.endWindowResize())
 
 // 页面高度改变监听
 window.api.pageHeightChangeEvent()
@@ -106,12 +142,56 @@ window.api.showMsgEvent((type, msg) => {
 @import '../css/translate-input.scss';
 
 .block {
+  position: relative;
   margin-left: 10px;
   margin-right: 10px;
   border-radius: 8px;
   background-color: var(--ttime-translate-color-background);
   box-shadow: 1px 1px 4px -1px var(--ttime-box-shadow-color);
   border: solid 1px var(--ttime-translate-border-color);
+}
+
+.block.manual-height {
+  box-sizing: border-box;
+  height: calc(100vh - 5px);
+  display: flex;
+  flex-direction: column;
+
+  > :first-child {
+    flex-shrink: 0;
+  }
+
+  .block-layer {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+  }
+}
+
+.resize-grip {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  z-index: 10;
+  cursor: nwse-resize;
+  touch-action: none;
+  user-select: none;
+  -webkit-app-region: no-drag;
+  border-bottom-right-radius: 8px;
+  background-color: var(--ttime-translate-color-background);
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 9px;
+    height: 9px;
+    background: repeating-linear-gradient(135deg, transparent 0 3px, #999 3px 4px);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
 }
 
 .block-layer {
