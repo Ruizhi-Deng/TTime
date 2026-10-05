@@ -28,12 +28,29 @@ export class MainWindowResize {
 
   autoHeight(height: number): void {
     if (this.manualHeight || this.drag || !Number.isFinite(height)) return
-    const width = this.win.getSize()[0]
+    const bounds = this.win.getBounds()
     const nextHeight = Math.max(MIN_HEIGHT, Math.round(height))
-    this.win.setSize(width, nextHeight)
-    // Preserve the existing workaround for Windows fractional DPI rounding.
-    const actualWidth = this.win.getSize()[0]
-    if (actualWidth > width) this.win.setSize(width - (actualWidth - width), nextHeight)
+    // Typing repeatedly requests the same maximum height. Avoid a native resize
+    // unless the height changes, and keep the pre-resize origin as the anchor.
+    if (bounds.height === nextHeight) return
+    const target = { ...bounds, height: nextHeight }
+    this.win.setBounds(target)
+
+    // Windows frameless bounds and fractional DPI can report a shifted origin
+    // or rounded-up size. Correct once against the original target, so another
+    // content update cannot adopt that shift and accumulate position drift.
+    const actual = this.win.getBounds()
+    if (
+      actual.x !== target.x || actual.y !== target.y ||
+      actual.width > target.width || actual.height > target.height
+    ) {
+      this.win.setBounds({
+        x: target.x + (target.x - actual.x),
+        y: target.y + (target.y - actual.y),
+        width: Math.max(MIN_WIDTH, target.width - Math.max(0, actual.width - target.width)),
+        height: Math.max(MIN_HEIGHT, target.height - Math.max(0, actual.height - target.height))
+      })
+    }
   }
 
   start(): void {
