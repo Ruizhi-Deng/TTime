@@ -7,16 +7,10 @@ on:
         description: Publish this version as a GitHub Release after verification
         type: boolean
         default: false
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - "docs/**"
-      - "**/*.md"
 
 concurrency:
-  group: windows-${{ github.ref }}-${{ inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community ') }}
-  cancel-in-progress: ${{ !(inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community ')) }}
+  group: windows-${{ github.ref }}-${{ inputs.publish_release == true }}
+  cancel-in-progress: ${{ inputs.publish_release != true }}
 
 jobs:
   build-windows:
@@ -27,7 +21,7 @@ jobs:
 
     steps:
       - name: Require main for releases
-        if: inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community ')
+        if: inputs.publish_release == true
         shell: pwsh
         run: |
           if ($env:GITHUB_REF -ne 'refs/heads/main') {
@@ -92,7 +86,7 @@ jobs:
           compression-level: 0
 
       - name: Publish release
-        if: github.ref == 'refs/heads/main' && (inputs.publish_release == true || startsWith(github.event.head_commit.message, 'Release TTime Community '))
+        if: github.ref == 'refs/heads/main' && inputs.publish_release == true
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
