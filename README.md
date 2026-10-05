@@ -1,8 +1,8 @@
-# TTime Community 1.0.0
+# TTime Community
 
 单用户本地翻译与 OCR 桌面应用，基于 [TTime](https://github.com/InkTimeRecord/TTime) 公开的 0.9.2 源码维护。
 
-[下载 Windows 安装版与便携版](https://github.com/Ruizhi-Deng/TTime/releases/latest) · [配置与构建说明](docs/community-branch.md) · [1.0.0 更新说明](docs/releases/v1.0.0.md)
+[下载 Windows 安装版与便携版](https://github.com/Ruizhi-Deng/TTime/releases/latest) · [配置与构建说明](docs/community-branch.md) · [发布记录](https://github.com/Ruizhi-Deng/TTime/releases)
 
 ## 主要功能
 
