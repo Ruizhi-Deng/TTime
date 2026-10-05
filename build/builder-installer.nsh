@@ -16,28 +16,45 @@
 
 ; 安装时触发
 !macro customInstall
-  ; 注册表中检测 VC_redist.x64.exe DLL 是否安装
+  ; 检测 Microsoft Visual C++ 2015-2022 x64 Runtime。
   ; VC_redist.x64.exe 下载来源：https://aka.ms/vs/17/release/VC_redist.x64.exe
-  ; 目前内置 VC_redist.x64.exe 的版本号为 14.34
-  ; 目前下面校验有个问题：
-  ;   因为内置的版本是 14.34 ，而如果用户电脑上当前安装的版本大于 14.34 时下列校验就会以为没有安装 VC_redist
-  ;   所以这里手动把大于 14.34 的新版本加入到下列中作判断 如果后续 VC_redist 版本更新了 下面的校验也需要同步更新
-  ;   最新版本号是通过上面的下载来源获取到的最新版本查看的
-  ReadRegStr $0 HKEY_CLASSES_ROOT "Installer\Dependencies\VC,redist.x64,amd64,14.34,bundle" "Version"
-  ${If} $0 == ""
-      ReadRegStr $0 HKEY_CLASSES_ROOT "Installer\Dependencies\VC,redist.x64,amd64,14.35,bundle" "Version"
+  ; 当前内置安装包为 14.34，因此已安装 14.34 或更高版本时都应直接复用。
+  ;
+  ; Microsoft 将 v14 Runtime 的版本写入：
+  ; HKLM\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64
+  ; 32 位 NSIS 在 64 位 Windows 上会自动访问对应的 Wow6432Node 视图。
+  ;
+  ; 不再枚举 Installer\Dependencies 中的 14.34/14.35/... bundle 名称，
+  ; 否则每次微软发布新 minor 版本都会把新版本误判成“未安装”。
+  SetRegView 32
+  ReadRegDWORD $R0 HKLM "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" "Installed"
+  ReadRegDWORD $R1 HKLM "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" "Major"
+  ReadRegDWORD $R2 HKLM "SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" "Minor"
+  SetRegView lastused
+
+  StrCpy $R3 "0"
+  ${If} $R0 == 1
+    ${If} $R1 > 14
+      StrCpy $R3 "1"
+    ${ElseIf} $R1 == 14
+      ${If} $R2 >= 34
+        StrCpy $R3 "1"
+      ${EndIf}
+    ${EndIf}
   ${EndIf}
-  ${If} $0 == ""
-      ReadRegStr $0 HKEY_CLASSES_ROOT "Installer\Dependencies\VC,redist.x64,amd64,14.36,bundle" "Version"
-  ${EndIf}
-  ${If} $0 == ""
-      ReadRegStr $0 HKEY_CLASSES_ROOT "Installer\Dependencies\VC,redist.x64,amd64,14.37,bundle" "Version"
-  ${EndIf}
-  ${If} $0 == ""
-      ; 不存在则提示安装
-      MessageBox MB_OK "检测到电脑缺少DLL依赖文件，点击确认后将会弹出更新界面"
-      File /oname=$PLUGINSDIR\VC_redist.x64.exe "${BUILD_RESOURCES_DIR}\VC_redist.x64.exe"
-      ExecWait '"$PLUGINSDIR\VC_redist.x64.exe"'
+
+  ${If} $R3 != 1
+    ; 仅在确实缺少所需 Runtime 时静默安装，避免较新版本触发“设置失败”弹窗。
+    File /oname=$PLUGINSDIR\VC_redist.x64.exe "${BUILD_RESOURCES_DIR}\VC_redist.x64.exe"
+    ExecWait '"$PLUGINSDIR\VC_redist.x64.exe" /install /quiet /norestart' $R4
+
+    ; 0 = 成功，3010 = 成功但建议重启，1638 = 已存在其他兼容版本。
+    ; 1638 作为兜底兼容：即使注册表布局发生变化，也不要向用户显示误导性的失败窗口。
+    ${If} $R4 != 0
+    ${AndIf} $R4 != 3010
+    ${AndIf} $R4 != 1638
+      MessageBox MB_ICONEXCLAMATION|MB_OK "Microsoft Visual C++ 运行库安装失败（错误码：$R4）。TTime 可能无法正常启动，请手动安装最新的 Visual C++ 2015-2022 Redistributable (x64)。"
+    ${EndIf}
   ${EndIf}
 
 ; 安装时删除开机自启配置 防止如果用户前一个版本是开机自启的
