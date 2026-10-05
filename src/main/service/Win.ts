@@ -1,4 +1,4 @@
-import { app, clipboard, ipcMain, nativeImage } from 'electron'
+import { app, clipboard, ipcMain, nativeImage, screen } from 'electron'
 import { GlobalShortcutEvent } from './GlobalShortcutEvent'
 import { isNull } from '../../common/utils/validate'
 import { SystemTypeEnum } from '../enums/SystemTypeEnum'
@@ -6,18 +6,34 @@ import AutoLaunch from 'auto-launch'
 import log from '../utils/log'
 import { EnvEnum } from '../enums/EnvEnum'
 import GlobalWin from './GlobalWin'
+import StoreService from './StoreService'
+import { MainWindowResize } from './MainWindowResize'
 
 class WinEvent {
   static mainWinInfo
 
   constructor(mainWinInfo) {
     WinEvent.mainWinInfo = mainWinInfo
+    const sizing = new MainWindowResize(
+      GlobalWin.mainWin,
+      () => screen.getCursorScreenPoint(),
+      (width) => StoreService.configSet('mainWinWidth', width)
+    )
+    for (const [channel, action] of [
+      ['main-window-resize-start', (): void => sizing.start()],
+      ['main-window-resize-move', (): void => sizing.move()],
+      ['main-window-resize-end', (): void => sizing.end()]
+    ] as const) {
+      ipcMain.on(channel, (event) => {
+        if (event.sender === GlobalWin.mainWin.webContents) action()
+      })
+    }
     /**
      * 监听页面高度更新窗口大小
      */
     ipcMain.handle('window-height-change-event', (_event, height) => {
       // 更新窗口大小
-      WinEvent.updateWinSize(GlobalWin.mainWin, GlobalWin.mainWin.getSize()[0], height)
+      if (_event.sender === GlobalWin.mainWin.webContents) sizing.autoHeight(height)
     })
     /**
      * 文字写入剪贴板
@@ -161,29 +177,6 @@ class WinEvent {
         })
       }
     })
-  }
-
-  /**
-   * 更新窗口大小
-   *
-   * @param win       窗口
-   * @param width     宽度
-   * @param height    高度
-   */
-  static updateWinSize(win, width, height): void {
-    // win.setMaximumSize(width, height)
-    win.setMinimumSize(450, height)
-    win.setSize(width, height)
-    // Electron 在Win系统环境中当设置了缩放比例后，部分电脑在设置大小时会与设置的原始大小不一致
-    // 例如：设置 500 的宽度，但实际会设置变成 501
-    // 所以此处在设置完毕后再检测一遍 如果错误则重新计算设置一次
-    // 问题详见：https://github.com/electron/electron/issues/27651
-    const newWidth = win.getSize()[0]
-    if (newWidth != width) {
-      if (newWidth > width) {
-        win.setSize(width - (newWidth - width), height)
-      }
-    }
   }
 }
 
