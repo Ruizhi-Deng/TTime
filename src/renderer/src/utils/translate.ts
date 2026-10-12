@@ -1,5 +1,6 @@
 import { isNull } from '../../../common/utils/validate'
 import ElMessageExtend from './messageExtend'
+import { playSystemSpeech } from './systemSpeech'
 
 /**
  * 文字写入到剪贴板
@@ -51,11 +52,7 @@ const copySnakeCase = (text): void => {
  * @param text 播放的文字
  */
 const playSpeech = (text): void => {
-  const synth = window.speechSynthesis
-  const msg = new SpeechSynthesisUtterance(text)
-  // 先清除当前正在播放的语音再播放
-  synth.cancel()
-  synth.speak(msg)
+  void playSystemSpeech(String(text ?? ''), (message) => ElMessageExtend.error(message))
 }
 
 /**
