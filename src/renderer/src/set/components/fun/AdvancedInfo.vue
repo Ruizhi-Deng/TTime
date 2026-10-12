@@ -1,20 +1,10 @@
 <template>
-  <el-form :model="basiInfo" label-width="150px">
+  <el-form :model="advancedSettingInfo" label-width="150px">
     <span class="group-title-span none-select"> 翻译设置 </span>
     <el-divider />
     <el-form-item class="none-select" label="语音播放源">
-      <el-tooltip placement="bottom-start">
-        <template #content>
-          除了TTime播放源以外其他语音播放源来自第三方，需要网络调用<br />当网速过慢时，可能会出现点击没反应的情况，一般都是因为网络延迟造成</template
-        >
-        <el-icon class="set-page-icon"><QuestionFilled /></el-icon>
-      </el-tooltip>
       <div class="comment-wrap-block">
-        <el-radio-group v-model="basiInfo.playSpeechService" @change="playSpeechServiceEvent">
-          <el-radio :label="PlaySpeechServiceEnum.TTIME">TTime</el-radio>
-          <el-radio :label="PlaySpeechServiceEnum.YOUDAO">网易有道</el-radio>
-          <el-radio :label="PlaySpeechServiceEnum.SOGOU">搜狗</el-radio>
-        </el-radio-group>
+        <span>系统语音（TTime）</span>
       </div>
     </el-form-item>
     <el-form-item class="none-select" label="翻译记录">
@@ -152,23 +142,8 @@
 // 翻译内容框内容
 import { h, ref } from 'vue'
 import { YesNoEnum } from '../../../../../common/enums/YesNoEnum'
-import { PlaySpeechServiceEnum } from '../../../../../common/enums/PlaySpeechServiceEnum'
 import { cacheGet, cacheSet } from '../../../utils/cacheUtil'
 import { ElMessageBox } from 'element-plus'
-
-const basiInfo = ref({
-  playSpeechService: cacheGet('playSpeechService')
-})
-
-/**
- * 播放语音源选择事件
- *
- * @param playSpeechService 播放服务类型
- */
-const playSpeechServiceEvent = (playSpeechService): void => {
-  cacheSet('playSpeechService', playSpeechService)
-  basiInfo.value.playSpeechService = playSpeechService
-}
 
 /**
  * 翻译相关设置

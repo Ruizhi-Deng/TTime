@@ -150,8 +150,8 @@ class StoreService {
       })
     }
 
-    // 语音播放源
-    if (!StoreService.configHas('playSpeechService')) {
+    // 已移除有道、搜狗播放源，将旧配置迁移到系统语音。
+    if (StoreService.configGet('playSpeechService') !== PlaySpeechServiceEnum.TTIME) {
       StoreService.configSet('playSpeechService', PlaySpeechServiceEnum.TTIME)
     }
     // 初始化置顶时允许隐藏窗口状态

@@ -8,16 +8,6 @@ class PlaySpeechServiceEnum {
    */
   static TTIME = 'TTime'
 
-  /**
-   * 有道
-   */
-  static YOUDAO = 'YouDao'
-
-  /**
-   * 搜狗
-   */
-  static SOGOU = 'SoGou'
-
 }
 
 export { PlaySpeechServiceEnum }

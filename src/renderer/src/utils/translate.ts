@@ -1,7 +1,5 @@
 import { isNull } from '../../../common/utils/validate'
 import ElMessageExtend from './messageExtend'
-import { cacheGet } from './cacheUtil'
-import { PlaySpeechServiceEnum } from '../../../common/enums/PlaySpeechServiceEnum'
 
 /**
  * 文字写入到剪贴板
@@ -53,35 +51,11 @@ const copySnakeCase = (text): void => {
  * @param text 播放的文字
  */
 const playSpeech = (text): void => {
-  const playSpeechService = cacheGet('playSpeechService')
-  if (playSpeechService === PlaySpeechServiceEnum.TTIME) {
-    const synth = window.speechSynthesis
-    const msg = new SpeechSynthesisUtterance(text)
-    // 先清除当前正在播放的语音再播放
-    synth.cancel()
-    synth.speak(msg)
-  } else {
-    playSpeechNewAudioByService(playSpeechService, text)
-  }
-}
-
-/**
- * 播放语音
- *
- * @param playSpeechService 播放语音服务
- * @param text              播放的文字
- */
-const playSpeechNewAudioByService = (playSpeechService, text): void => {
-  let url
-  if (playSpeechService === PlaySpeechServiceEnum.YOUDAO) {
-    url = 'https://dict.youdao.com/dictvoice?audio=' + text + '&le=zh'
-  } else if (playSpeechService === PlaySpeechServiceEnum.SOGOU) {
-    url =
-      'https://fanyi.sogou.com/reventondc/synthesis?text=' +
-      text +
-      '&speed=1&lang=zh-CHS&from=translateweb&speaker=6'
-  }
-  playSpeechNewAudio(url)
+  const synth = window.speechSynthesis
+  const msg = new SpeechSynthesisUtterance(text)
+  // 先清除当前正在播放的语音再播放
+  synth.cancel()
+  synth.speak(msg)
 }
 
 /**
